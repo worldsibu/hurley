@@ -1,7 +1,7 @@
 #!/bin/bash
-ROOT_DIR='..'
+ROOT_DIR=<%= path %>
 
-<%= path %>/scripts/stop.sh
-<%= path %>/scripts/clean.sh
-<%= path %>/scripts/start.sh
-<%= path %>/scripts/init.sh
+$ROOT_DIR/scripts/stop.sh $ROOT_DIR
+$ROOT_DIR/scripts/clean.sh $ROOT_DIR
+$ROOT_DIR/scripts/start.sh $ROOT_DIR
+$ROOT_DIR/scripts/init.sh $ROOT_DIR
