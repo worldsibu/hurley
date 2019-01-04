@@ -14,8 +14,7 @@
         ]
     },
     "include": [
-        "./src",
-        "./templates",
+        "./src"
     ],
     "exclude": [
         "./tests/**/*"

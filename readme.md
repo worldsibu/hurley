@@ -15,8 +15,23 @@ It is an open source project under an Apache 2.0 license to help you create Conv
 npm i -g @worldsibu/insitor
 ```
 
+### Bring up a new development network
+
+```bash
+insitor new <network-name>
+```
+
+### Clean your development environment
+
+Delete the development blockchain network.
+
+```bash
+insitor clean
+```
+
 ## Details
 
+Not implemented yet.
 
 ## Roadmap 🗺
 
