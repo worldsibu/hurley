@@ -1,6 +1,6 @@
 {
   "name": "@worldsibu/insitor",
-  "version": "0.1.2",
+  "version": "0.1.31",
   "description": "The development environment toolset for blockchain projects",
   "main": "index.js",
   "files": [
@@ -9,6 +9,7 @@
     "templates/*",
     "network-objects/*",
     "scripts/*",
+    "docker-compose.yml",
     "package.json"
   ],
   "bin": {
