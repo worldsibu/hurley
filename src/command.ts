@@ -6,9 +6,9 @@ import { resolve } from 'path';
 const fixPath = p => resolve(process.cwd(), p);
 
 const tasks = {
-    async createNetwork(name: string, organizations?: string, users?: string) {
+    async createNetwork(name: string, organizations?: string, users?: string, channels?: string) {
         name = name.replace(/[^a-zA-Z ]/g, '');
-        return await CLI.createNetwork(name, organizations, users);
+        return await CLI.createNetwork(name, organizations, users, channels);
     },
     async cleanNetwork() {
         return await CLI.cleanNetwork();
@@ -30,21 +30,23 @@ const tasks = {
 program
     .command('new <name>')
     // .option('-v, --version <version>', 'Hyperledger Fabric version')
-    // .option('-o, --organizations <organizations>', 'Amount of organizations')
-    // .option('-u, --users <users>', 'Users per organization')
+    .option('-c, --channels <channels>', 'Channels in the network')
+    .option('-o, --organizations <organizations>', 'Amount of organizations')
+    .option('-u, --users <users>', 'Users per organization')
     // .option('-p, --peers <peers>', 'Peers per organization')
     .action(async (name: string, cmd: any) => {
         await tasks.createNetwork(
             name,
-            // cmd.organizations,
-            // cmd.users
-            );
+            cmd.organizations || 2,
+            cmd.users || 2,
+            cmd.channels || 3
+        );
     });
 program
     .command('clean')
     .action(async (name: string, cmd: any) => {
         await tasks.cleanNetwork(
-            );
+        );
     });
 
 program

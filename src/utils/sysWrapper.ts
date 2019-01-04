@@ -6,12 +6,13 @@ import { exec } from 'shelljs';
 import { join } from 'path';
 
 export module SysWrapper {
-
+  let d = console.log;
   /** Create a file to specific path from contents.
    * @returns Promise<void>
    */
   export function createFile(filePath: string, contents: string): Promise<void> {
     return new Promise(function (fulfilled, rejected) {
+      d(`about to create ${filePath} with ${contents}`);
       try {
         write(filePath, contents, fulfilled);
       } catch (ex) {
@@ -101,7 +102,13 @@ export module SysWrapper {
         { silent: false }
       );
     }
+  }
 
+  export async function execContent(content: any): Promise<void> {
+    return exec(
+      content,
+      { silent: false }
+    );
   }
 
   /** Get a file from a path.
