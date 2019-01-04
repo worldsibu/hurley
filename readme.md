@@ -26,6 +26,8 @@ Proposed current roadmap. Have ideas? Post them in the [Issues section](https://
 
 This project is currently under development and it's changing fast, but you can use it for your projects and if something doesn't work or would like new features provide feedback. We love community feedback!
 
+Currently based on Fabric Samples from Hyperledger Fabric.
+
 ## Support
 
 * For recommendations, feature requests, or bugs go to our [issues section](https://github.com/worldsibu/insitor/issues).
