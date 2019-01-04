@@ -12,7 +12,7 @@ It is an open source project under an Apache 2.0 license to help you create Conv
 ## Usage
 
 ```bash
-npm i -g insitor
+npm i -g @worldsibu/insitor
 ```
 
 ## Details
