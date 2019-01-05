@@ -27,7 +27,7 @@ export class Analytics {
         // Ask for permission the first time
         if (this.insight.optOut === undefined) {
             // tslint:disable-next-line:max-line-length
-            this.insight.askPermission('May Insitor anonymoysly report usage statistics to improve the tool over time?');
+            this.insight.askPermission('May hurley anonymoysly report usage statistics to improve the tool over time?');
             if (this.insight.optOut) {
                 this.permissionRejection();
             } else {

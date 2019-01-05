@@ -1,6 +1,6 @@
-# Insitor
+# Hurley
 
-Insitor is the **development environment toolset** for blockchain projects. It supports Hyperledger Fabric and is being ported to support other chain technologies.
+Hurley is the **development environment toolset** for blockchain projects. It supports Hyperledger Fabric and is being ported to support other chain technologies.
 
 It is an open source project under an Apache 2.0 license to help you create Convector projects easily.
 
@@ -12,45 +12,45 @@ It is an open source project under an Apache 2.0 license to help you create Conv
 ## Usage
 
 ```bash
-npm i -g @worldsibu/insitor
+npm i -g @worldsibu/hurley
 ```
 
 ### Basic network management
 
 ```bash
 # Start a new blockchain network with 2 organizations, 2 users per organization, and 1 channel, localted at ~/Home/hyperledger-fabric-network
-insitor new
+hurley new
 
 # Clean every blockchain network deployment component
-insitor clean
+hurley clean
 ```
 
 ## Details
 
-### insitor new
+### hurley new
 
 Create a new blockchain network in your computer.
 
 ```bash
 # New project
-insitor new
+hurley new
     [-o -organizations <amount-of-organizations>]
     [-u -users <users-per-organization>]
     [-c -channels <amount-of-channels>]
     [-p -path <path-to-deploy >] # defaults to ~/Home/hyperledger-fabric-network
 ```
 
-### insitor clean
+### hurley clean
 
 Clear your environment from all the components.
 
 ```bash
-insitor clean
+hurley clean
 ```
 
 ## Roadmap 🗺
 
-Have ideas? Post them in the [Issues section](https://github.com/worldsibu/insitor/issues).
+Have ideas? Post them in the [Issues section](https://github.com/worldsibu/hurley/issues).
 
 ## Important ⚗️
 
@@ -60,6 +60,6 @@ Currently based on Fabric Samples from Hyperledger Fabric.
 
 ## Support
 
-* For recommendations, feature requests, or bugs go to our [issues section](https://github.com/worldsibu/insitor/issues).
-* News on Convector, Insitor, or WorldSibu, subscribe to our [Newsletter](https://worldsibu.io/subscribe/).
+* For recommendations, feature requests, or bugs go to our [issues section](https://github.com/worldsibu/hurley/issues).
+* News on Convector, hurley, or WorldSibu, subscribe to our [Newsletter](https://worldsibu.io/subscribe/).
 * Need support? Chat directly with our team, join our [Discord](https://discord.gg/twRwpWt).

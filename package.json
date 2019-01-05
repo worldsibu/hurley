@@ -13,7 +13,7 @@
     "package.json"
   ],
   "bin": {
-    "insitor": "./dist/command.js"
+    "hurley": "./dist/command.js"
   },
   "scripts": {
     "clean": "rimraf dist",
@@ -24,10 +24,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/worldsibu/insitor.git"
+    "url": "git+https://github.com/worldsibu/hurley.git"
   },
   "keywords": [
-    "insitor",
+    "hurley",
     "development",
     "hyperledger",
     "fabric",
@@ -37,9 +37,9 @@
   "author": "WorldSibu",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/worldsibu/insitor/issues"
+    "url": "https://github.com/worldsibu/hurley/issues"
   },
-  "homepage": "https://github.com/worldsibu/insitor#readme",
+  "homepage": "https://github.com/worldsibu/hurley#readme",
   "dependencies": {
     "async": "^2.1.4",
     "chai": "^4.2.0",

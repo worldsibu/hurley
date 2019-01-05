@@ -1,3 +1,3 @@
 export function l(text: string) {
-    console.log(`[Insitor] - ${text}`);
+    console.log(`[hurley] - ${text}`);
 }

@@ -21,7 +21,7 @@ export class DockerComposeYamlGenerator extends BaseGenerator {
         this.contents = `version: '2'
 
 networks:
-  insitor_dev_net:
+  hurley_dev_net:
 
 services:
     # Orderer
@@ -45,7 +45,7 @@ services:
 ${this.options.orgs.map(org => `
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/peers/peer0.${org}.hurley.lab/:/etc/hyperledger/msp/peer${org}`).join('')}
         networks:
-            - insitor_dev_net
+            - hurley_dev_net
 
 ${this.options.orgs.map((org, i) => `
     # ${org}
@@ -63,7 +63,7 @@ ${this.options.orgs.map((org, i) => `
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/ca/:/etc/hyperledger/fabric-ca-server-config
         container_name: ca.${org}.hurley.lab
         networks:
-            - insitor_dev_net
+            - hurley_dev_net
 
     # Peer
     peer0.${org}.hurley.lab:
@@ -93,7 +93,7 @@ ${this.options.orgs.map((org, i) => `
             - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.peer0.${org}.hurley.lab:5984
             - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
             - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=net_insitor_dev_net
+            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=net_hurley_dev_net
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric
         command: peer node start --peer-chaincodedev=false
         ports:
@@ -110,7 +110,7 @@ ${this.options.orgs.map((org, i) => `
             - orderer.hurley.lab
             - couchdb.peer0.${org}.hurley.lab
         networks:
-            - insitor_dev_net
+            - hurley_dev_net
 
     # Couch
     couchdb.peer0.${org}.hurley.lab:
@@ -122,7 +122,7 @@ ${this.options.orgs.map((org, i) => `
         ports:
             - 5${i}84:5984
         networks:
-            - insitor_dev_net
+            - hurley_dev_net
 
 `).join('')}
       
