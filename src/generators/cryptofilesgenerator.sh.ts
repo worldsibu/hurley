@@ -12,7 +12,7 @@ export class CryptoGeneratorShGenerator extends BaseGenerator {
   contents = `
   #!/bin/bash
   ROOT_DIR=${join(__dirname, '../../')}
-  BIN=$ROOT_DIR/scripts/bin
+  BIN=$ROOT_DIR/tools
   NETWORK_ROOT=${this.options.networkRootPath}
   TARGET=$NETWORK_ROOT/artifacts
   

@@ -12,7 +12,6 @@ export module SysWrapper {
    */
   export function createFile(filePath: string, contents: string): Promise<void> {
     return new Promise(function (fulfilled, rejected) {
-      d(`about to create ${filePath} with ${contents}`);
       try {
         write(filePath, contents, fulfilled);
       } catch (ex) {
@@ -231,5 +230,13 @@ export module SysWrapper {
     editor.write(filePath,
       contents);
     editor.commit([], cb);
+  }
+
+  export function enumFilesInFolder(folder: string): Promise<string[]> {
+    return new Promise(function (fulfilled, rejected) {
+      fs.readdir(folder, (err, files) => {
+        fulfilled(files);
+      });
+    });
   }
 }

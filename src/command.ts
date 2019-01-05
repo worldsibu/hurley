@@ -6,9 +6,9 @@ import { resolve } from 'path';
 const fixPath = p => resolve(process.cwd(), p);
 
 const tasks = {
-    async createNetwork(name: string, organizations?: string, users?: string, channels?: string) {
-        name = name.replace(/[^a-zA-Z ]/g, '');
-        return await CLI.createNetwork(name, organizations, users, channels);
+    async createNetwork(organizations?: string, users?: string, channels?: string,
+        path?: string) {
+        return await CLI.createNetwork(organizations, users, channels, path);
     },
     async cleanNetwork() {
         return await CLI.cleanNetwork();
@@ -28,18 +28,19 @@ const tasks = {
 };
 
 program
-    .command('new <name>')
+    .command('new')
     // .option('-v, --version <version>', 'Hyperledger Fabric version')
     .option('-c, --channels <channels>', 'Channels in the network')
     .option('-o, --organizations <organizations>', 'Amount of organizations')
     .option('-u, --users <users>', 'Users per organization')
+    .option('-p, --path <path>', 'Path to deploy the network')
     // .option('-p, --peers <peers>', 'Peers per organization')
     .action(async (name: string, cmd: any) => {
         await tasks.createNetwork(
-            name,
             cmd.organizations || 2,
             cmd.users || 2,
-            cmd.channels || 3
+            cmd.channels || 3,
+            cmd.path
         );
     });
 program

@@ -80,7 +80,6 @@ export class CryptoConfigYamlGenerator extends BaseGenerator {
 
   constructor(filename: string, path: string, private options: CryptoConfigOptions) {
     super(filename, path);
-    console.log(options);
     this.success = join(path, 'cryptoconfig.yaml.successful');
   }
 }

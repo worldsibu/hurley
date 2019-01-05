@@ -5,13 +5,16 @@ import * as Insight from 'insight';
 import { ConfigTxYamlGenerator } from './generators/configtx.yaml';
 import { CryptoConfigYamlGenerator } from './generators/cryptoconfig.yaml';
 import { CryptoGeneratorShGenerator } from './generators/cryptofilesgenerator.sh';
+import { DockerComposeYamlGenerator } from './generators/dockercompose.yaml';
+import { NetworkRestartShGenerator } from './generators/networkRestart.sh';
 
 export class CLI {
-    static async createNetwork(name: string, organizations?: string, users?: string, channels?: string) {
+    static async createNetwork(organizations?: string, users?: string, channels?: string,
+        path?: string) {
         const cli = new NetworkCLI();
         console.log(`organizations ${organizations}`);
-        await cli.init(name, Number.parseInt(organizations), Number.parseInt(users),
-            Number.parseInt(channels));
+        await cli.init(Number.parseInt(organizations), Number.parseInt(users),
+            Number.parseInt(channels), path);
         return cli;
     }
     static async cleanNetwork() {
@@ -44,11 +47,9 @@ export class NetworkCLI {
         this.analytics = new Analytics();
     }
 
-    public async init(name: string, organizations?: number, users?: number, channels?: number) {
-        // SysWrapper.execFile(join(__dirname, '../scripts/restart.sh'), {
-        //     path: join(__dirname,'../')
-        // });
-
+    public async init(organizations?: number, users?: number, channels?: number, path?: string) {
+        const homedir = require('os').homedir();
+        path = path ? join(homedir, path) : join(homedir, this.networkRootPath);
         let orgs = [];
         for (let i = 0; i < organizations; i++) {
             orgs.push(`org${i}`);
@@ -58,27 +59,47 @@ export class NetworkCLI {
             chs.push(`ch${i}`);
         }
 
-        const homedir = require('os').homedir();
-        let config = new ConfigTxYamlGenerator('configtx.yaml', join(homedir, this.networkRootPath), {
+        let config = new ConfigTxYamlGenerator('configtx.yaml', path, {
             orgs,
             channels: 1
         });
-        let cryptoConfig = new CryptoConfigYamlGenerator('crypto-config.yaml', join(homedir, this.networkRootPath), {
+        let cryptoConfig = new CryptoConfigYamlGenerator('crypto-config.yaml', path, {
             orgs,
             users
         });
-        let cryptoGenerator = new CryptoGeneratorShGenerator('generator.sh', join(homedir, this.networkRootPath), {
+        let dockerComposer = new DockerComposeYamlGenerator('docker-compose.yaml',
+            path, {
+                orgs,
+                networkRootPath: path,
+                envVars: {
+                    FABRIC_VERSION: 'x86_64-1.1.0',
+                    THIRDPARTY_VERSION: 'x86_64-0.4.6'
+                }
+            });
+        let cryptoGenerator = new CryptoGeneratorShGenerator('generator.sh', path, {
             orgs,
-            networkRootPath: join(homedir, this.networkRootPath),
+            networkRootPath: path,
             channels: chs
+        });
+        let networkRestart = new NetworkRestartShGenerator('restart.sh', path, {
+            organizations: orgs,
+            networkRootPath: path,
+            channels: chs,
+            users
         });
 
         await config.save();
         await cryptoConfig.save();
         await cryptoGenerator.run();
-        await cryptoGenerator.check();
 
-        this.analytics.trackNetworkNew(`NETWORK=${name}`);
+        await dockerComposer.build();
+        await dockerComposer.save();
+
+        await networkRestart.run();
+
+        this.analytics.trackNetworkNew(JSON.stringify({ organizations, users, channels, path }));
+
+        console.log(`Complete network deployed at ${join(homedir, path)}`);
     }
     public async clean() {
         SysWrapper.execFile(join(__dirname, '../scripts/clean.sh'), {
