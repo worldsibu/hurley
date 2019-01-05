@@ -23,9 +23,9 @@ client:
 channels:${this.options.channels.map(channel => `
     ${channel}:
         orderers:
-            - orderer.insitor.lab
+            - orderer.hurley.lab
         peers:${this.options.orgs.map(cOrg => `
-            peer0.${cOrg}.insitor.lab:
+            peer0.${cOrg}.hurley.lab:
                 endorsingPeer: true
                 chaincodeQuery: true
                 ledgerQuery: true
@@ -37,44 +37,44 @@ organizations:${this.options.orgs.map(cOrg => `
     ${cOrg}MSP:
         mspid: ${cOrg}MSP
         peers:
-            - peer0.${cOrg}.insitor.lab
+            - peer0.${cOrg}.hurley.lab
         certificateAuthorities:
-            - ca.${cOrg}.insitor.lab
+            - ca.${cOrg}.hurley.lab
         adminPrivateKey:
-            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.insitor.lab/users/Admin@${cOrg}.insitor.lab/msp/keystore/
+            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/users/Admin@${cOrg}.hurley.lab/msp/keystore/
         signedCert:
-            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.insitor.lab/users/Admin@${cOrg}.insitor.lab/msp/signcerts/
+            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/users/Admin@${cOrg}.hurley.lab/msp/signcerts/
 `).join('')}
 orderers:
-    orderer.insitor.lab:
+    orderer.hurley.lab:
         url: grpc://localhost:7050
         grpcOptions:
-            ssl-target-name-override: orderer.insitor.lab
+            ssl-target-name-override: orderer.hurley.lab
             grpc-max-send-message-length: 15
         tlsCACerts:
-            path: ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/insitor.lab/orderers/orderer.insitor.lab/msp/tlscacerts/tlsca.insitor.lab-cert.pem
+            path: ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
 
 peers:${this.options.orgs.map((cOrg, index) => `
-    peer0.${cOrg}.insitor.lab:
+    peer0.${cOrg}.hurley.lab:
         url: grpc://localhost:7${index}51
         eventUrl: grpc://localhost:7${index}52
         grpcOptions:
-            ssl-target-name-override: peer0.${cOrg}.insitor.lab
+            ssl-target-name-override: peer0.${cOrg}.hurley.lab
             grpc.keepalive_time_ms: 600000
         tlsCACerts:
-            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.insitor.lab/peers/peer0.${cOrg}.insitor.lab/msp/tlscacerts/tlsca.${cOrg}.insitor.lab-cert.pem
+            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/peers/peer0.${cOrg}.hurley.lab/msp/tlscacerts/tlsca.${cOrg}.hurley.lab-cert.pem
 `).join('')}
 certificateAuthorities:${this.options.orgs.map((cOrg, index) => `
-    ca.${cOrg}.insitor.lab:
+    ca.${cOrg}.hurley.lab:
         url: http://localhost:7${index}54
         httpOptions:
             verify: false
         tlsCACerts:
-            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.insitor.lab/ca/ca.${cOrg}.insitor.lab-cert.pem
+            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/ca/ca.${cOrg}.hurley.lab-cert.pem
         registrar:
             - enrollId: admin
               enrollSecret: adminpw
-        caName: ca.${cOrg}.insitor.lab
+        caName: ca.${cOrg}.hurley.lab
 `).join('')}
   ` ;
 

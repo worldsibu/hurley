@@ -30,7 +30,7 @@ USERS=${this.options.users}
 function createchannel() {
     ${this.options.channels.map(ch => `
     echo "Creating ${ch} channel block in peer $1"
-    docker exec $1 peer channel create  -o orderer.insitor.lab:7050 -c ${ch} -f /etc/hyperledger/configtx/${ch}.tx
+    docker exec $1 peer channel create  -o orderer.hurley.lab:7050 -c ${ch} -f /etc/hyperledger/configtx/${ch}.tx
 
     docker exec $1 mv ${ch}.block /shared/
     `).join('')}
@@ -46,7 +46,7 @@ function joinchannel() {
 function setanchor() {
     ${this.options.channels.map(ch => `
     echo "Creating ${ch} anchor block in peer $1"
-    docker exec $1 peer channel update  -o orderer.insitor.lab:7050 -c ${ch} -f /etc/hyperledger/configtx/$1.${ch}.tx
+    docker exec $1 peer channel update  -o orderer.hurley.lab:7050 -c ${ch} -f /etc/hyperledger/configtx/$1.${ch}.tx
 
     `).join('')}
 }
@@ -59,13 +59,13 @@ function registeruser() {
     node $PROJECT_ROOT/node_modules/@worldsibu/convector-tool-dev-env/dist/command.js add-user $1 admin $4 -a "org1" -r client -k "${this.options.networkRootPath}/.hfc-$2" -p "${this.options.networkRootPath}/network-profiles/$2.network-profile.yaml"
 }
 
-createchannel peer0.${this.options.organizations[0]}.insitor.lab
+createchannel peer0.${this.options.organizations[0]}.hurley.lab
 
 sleep 5
 
-${this.options.organizations.map(org => `joinchannel peer0.${org}.insitor.lab
+${this.options.organizations.map(org => `joinchannel peer0.${org}.hurley.lab
 `).join('')}
-${this.options.organizations.map(org => `setanchor peer0.${org}.insitor.lab
+${this.options.organizations.map(org => `setanchor peer0.${org}.hurley.lab
 `).join('')}
 
 sleep 5
