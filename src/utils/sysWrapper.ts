@@ -206,7 +206,6 @@ export module SysWrapper {
   export function renderTemplateFromContent(templateContent: string, content: any): Promise<string> {
     return new Promise(function (fulfilled, rejected) {
       let renderedFile = ejs.render(templateContent, content);
-      console.log(renderedFile);
       fulfilled(renderedFile);
     });
   }

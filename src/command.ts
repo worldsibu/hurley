@@ -35,17 +35,21 @@ program
     .option('-u, --users <users>', 'Users per organization')
     .option('-p, --path <path>', 'Path to deploy the network')
     // .option('-p, --peers <peers>', 'Peers per organization')
-    .action(async (name: string, cmd: any) => {
-        await tasks.createNetwork(
-            cmd.organizations || 2,
-            cmd.users || 2,
-            cmd.channels || 3,
-            cmd.path
-        );
+    .action(async (cmd: any) => {
+        if (cmd) {
+            await tasks.createNetwork(
+                !cmd.organizations || (cmd.organizations >= 2 || cmd.organizations >= 10) ? 2 : cmd.organizations,
+                !cmd.users || (cmd.users <= 1 || cmd.users >= 10) ? 1 : cmd.users,
+                !cmd.channels || (cmd.channels <= 1 || cmd.channels >= 7) ? 1 : cmd.channels,
+                cmd.path
+            );
+        } else {
+            await tasks.createNetwork();
+        }
     });
 program
     .command('clean')
-    .action(async (name: string, cmd: any) => {
+    .action(async () => {
         await tasks.cleanNetwork(
         );
     });

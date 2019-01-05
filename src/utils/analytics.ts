@@ -11,7 +11,7 @@ export class Analytics {
 
     constructor() {
         let pkg = JSON.parse(fs.readFileSync(join(__dirname, '../../package.json')).toString());
-        // console.log(pkg);
+        //l((pkg);
         this.insight = new Insight({
             // Google Analytics tracking code
             trackingCode: this.trackingCode,
@@ -66,7 +66,7 @@ export class Analytics {
 
     /** Explicit logging. */
     track(category: CategoryEnum, action: ActionEnum, label?: string) {
-        // console.log(!this.insight.optOut);
+        //l((!this.insight.optOut);
         if (!this.insight.optOut) {
             this.insight.trackEvent({
                 category: category,

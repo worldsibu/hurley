@@ -7,12 +7,13 @@ import { CryptoConfigYamlGenerator } from './generators/cryptoconfig.yaml';
 import { CryptoGeneratorShGenerator } from './generators/cryptofilesgenerator.sh';
 import { DockerComposeYamlGenerator } from './generators/dockercompose.yaml';
 import { NetworkRestartShGenerator } from './generators/networkRestart.sh';
+import { NetworkCleanShGenerator } from './generators/networkClean.sh';
+import { l } from './utils/logs';
 
 export class CLI {
     static async createNetwork(organizations?: string, users?: string, channels?: string,
         path?: string) {
         const cli = new NetworkCLI();
-        console.log(`organizations ${organizations}`);
         await cli.init(Number.parseInt(organizations), Number.parseInt(users),
             Number.parseInt(channels), path);
         return cli;
@@ -98,14 +99,25 @@ export class NetworkCLI {
         await networkRestart.run();
 
         this.analytics.trackNetworkNew(JSON.stringify({ organizations, users, channels, path }));
-
-        console.log(`Complete network deployed at ${join(homedir, path)}`);
+       l('************ Success!');
+       l(`Complete network deployed at ${path}`);
+       l(`Setup:
+        - Organizations: ${organizations}${orgs.map(org => `
+            * ${org}`).join('')}
+        - Users per organization: ${users+1} 
+            * admin ${Array.apply(null, { length: users }).map((user, index) => `
+            * user${index}`).join('')}
+        - Channels deployed: ${channels}${chs.map(ch => `
+            * ${ch}`).join('')}
+        `);
+       l(`You can find the network topology (ports, names) here: ${join(path, 'docker-compose.yaml')}`);
     }
     public async clean() {
-        SysWrapper.execFile(join(__dirname, '../scripts/clean.sh'), {
-            path: join(__dirname, '../')
-        });
+        let networkClean = new NetworkCleanShGenerator('clean.sh', 'na', null);
+        await networkClean.run();
         this.analytics.trackNetworkClean();
+       l('************ Success!');
+       l('Environment cleaned!');
     }
 }
 export class ChaincodeCLI {
