@@ -38,7 +38,7 @@ program
     .action(async (cmd: any) => {
         if (cmd) {
             await tasks.createNetwork(
-                !cmd.organizations || (cmd.organizations >= 2 || cmd.organizations >= 10) ? 2 : cmd.organizations,
+                !cmd.organizations || (cmd.organizations <= 2 || cmd.organizations >= 7) ? 2 : cmd.organizations,
                 !cmd.users || (cmd.users <= 1 || cmd.users >= 10) ? 1 : cmd.users,
                 !cmd.channels || (cmd.channels <= 1 || cmd.channels >= 7) ? 1 : cmd.channels,
                 cmd.path

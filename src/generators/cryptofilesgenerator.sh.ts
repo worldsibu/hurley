@@ -47,7 +47,7 @@ export class CryptoGeneratorShGenerator extends BaseGenerator {
     fail "Failed to generate $CH configuration transaction..."
   
     ${this.options.orgs.map(x => `
-    $BIN/configtxgen -profile OrgsChannel -outputAnchorPeersUpdate $TARGET/config/peer0.${x}.insitor.demo.$CH.tx -channelID $CH -asOrg ${x}MSP
+    $BIN/configtxgen -profile OrgsChannel -outputAnchorPeersUpdate $TARGET/config/peer0.${x}.insitor.lab.$CH.tx -channelID $CH -asOrg ${x}MSP
     fail "Failed to generate $CH anchor peer update for ${x}..."
     
     `).join('')}

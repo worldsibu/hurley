@@ -9,6 +9,7 @@ import { DockerComposeYamlGenerator } from './generators/dockercompose.yaml';
 import { NetworkRestartShGenerator } from './generators/networkRestart.sh';
 import { NetworkCleanShGenerator } from './generators/networkClean.sh';
 import { l } from './utils/logs';
+import { NetworkProfileYamlGenerator } from './generators/networkprofile.yaml';
 
 export class CLI {
     static async createNetwork(organizations?: string, users?: string, channels?: string,
@@ -53,7 +54,7 @@ export class NetworkCLI {
         path = path ? join(homedir, path) : join(homedir, this.networkRootPath);
         let orgs = [];
         for (let i = 0; i < organizations; i++) {
-            orgs.push(`org${i}`);
+            orgs.push(`org${i + 1}`);
         }
         let chs = [];
         for (let i = 0; i < channels; i++) {
@@ -89,35 +90,73 @@ export class NetworkCLI {
             users
         });
 
+        l(`About to create configtxyaml`);
         await config.save();
+        l(`Created and saved configtxyaml`);
+
+        l(`About to create cryptoconfigyaml`);
         await cryptoConfig.save();
+        l(`Created and saved cryptoconfigyaml`);
+
+        l(`About to create cryptoconfigsh`);
+        await cryptoGenerator.save();
+        l(`Created and saved cryptoconfigsh`);
+
+        l(`Running cryptoconfigsh`);
         await cryptoGenerator.run();
+        l(`Ran cryptoconfigsh`);
 
+        l(`Building compose`);
         await dockerComposer.build();
+        l(`Builded compose`);
+        l(`Saving compose`);
         await dockerComposer.save();
+        l(`Saved compose`);
 
+
+        l(`Creating network profiles`);
+        await Promise.all(orgs.map(async org => {
+            l(`Cleaning .hfc-${org}`);
+            await SysWrapper.removePath(join(path, `.hfc-${org}`));
+            l(`Creating for ${org}`);
+            return (new NetworkProfileYamlGenerator(`${org}.network-profile.yaml`,
+                join(path, './network-profiles'), {
+                    org,
+                    orgs,
+                    networkRootPath: path,
+                    channels: chs
+                })).save();
+        }
+        ));
+        l(`Created network profiles`);
+
+        l(`Creating network restart script`);
+        await networkRestart.save();
+        l(`Saved network restart script`);
+        l(`Running network restart script`);
         await networkRestart.run();
+        l(`Ran network restart script`);
 
         this.analytics.trackNetworkNew(JSON.stringify({ organizations, users, channels, path }));
-       l('************ Success!');
-       l(`Complete network deployed at ${path}`);
-       l(`Setup:
+        l('************ Success!');
+        l(`Complete network deployed at ${path}`);
+        l(`Setup:
         - Organizations: ${organizations}${orgs.map(org => `
             * ${org}`).join('')}
-        - Users per organization: ${users+1} 
+        - Users per organization: ${users + 1} 
             * admin ${Array.apply(null, { length: users }).map((user, index) => `
-            * user${index}`).join('')}
+            * User${index + 1}`).join('')}
         - Channels deployed: ${channels}${chs.map(ch => `
             * ${ch}`).join('')}
         `);
-       l(`You can find the network topology (ports, names) here: ${join(path, 'docker-compose.yaml')}`);
+        l(`You can find the network topology (ports, names) here: ${join(path, 'docker-compose.yaml')}`);
     }
     public async clean() {
         let networkClean = new NetworkCleanShGenerator('clean.sh', 'na', null);
         await networkClean.run();
         this.analytics.trackNetworkClean();
-       l('************ Success!');
-       l('Environment cleaned!');
+        l('************ Success!');
+        l('Environment cleaned!');
     }
 }
 export class ChaincodeCLI {

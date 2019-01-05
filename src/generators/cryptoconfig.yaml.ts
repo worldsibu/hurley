@@ -16,7 +16,7 @@ export class CryptoConfigYamlGenerator extends BaseGenerator {
     # Orderer
     # ---------------------------------------------------------------------------
     - Name: Orderer
-      Domain: insitor.demo
+      Domain: insitor.lab
       # ---------------------------------------------------------------------------
       # "Specs" - See PeerOrgs below for complete description
       # ---------------------------------------------------------------------------
@@ -30,7 +30,7 @@ export class CryptoConfigYamlGenerator extends BaseGenerator {
     # Org1
     # ---------------------------------------------------------------------------
     ${this.options.orgs.map(x=>`- Name: ${x}
-      Domain: ${x}.insitor.demo
+      Domain: ${x}.insitor.lab
       # ---------------------------------------------------------------------------
       # "Specs"
       # ---------------------------------------------------------------------------
@@ -48,8 +48,8 @@ export class CryptoConfigYamlGenerator extends BaseGenerator {
       #                 Org.Domain, respectively.
       # ---------------------------------------------------------------------------
       # Specs:
-      #   - Hostname: foo # implicitly "foo.org1.insitor.demo"
-      #     CommonName: foo27.org5.insitor.demo # overrides Hostname-based FQDN set above
+      #   - Hostname: foo # implicitly "foo.org1.insitor.lab"
+      #     CommonName: foo27.org5.insitor.lab # overrides Hostname-based FQDN set above
       #   - Hostname: bar
       #   - Hostname: baz
       # ---------------------------------------------------------------------------

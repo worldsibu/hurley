@@ -11,8 +11,8 @@ export class NetworkRestartShOptions {
 export class NetworkRestartShGenerator extends BaseGenerator {
     success = join(this.path, 'cyptofilesgenerator.sh.successful');
     contents =
-`#!/bin/bash
-PROJECT_ROOT=${join(__dirname,'../../')}
+        `#!/bin/bash
+PROJECT_ROOT=${join(__dirname, '../../')}
 
 #clean
 docker stop $(docker ps -a | awk '$2~/hyperledger/ {print $1}') 
@@ -30,7 +30,7 @@ USERS=${this.options.users}
 function createchannel() {
     ${this.options.channels.map(ch => `
     echo "Creating ${ch} channel block in peer $1"
-    docker exec $1 peer channel create  -o orderer.insitor.demo:7050 -c ${ch} -f /etc/hyperledger/configtx/${ch}.tx
+    docker exec $1 peer channel create  -o orderer.insitor.lab:7050 -c ${ch} -f /etc/hyperledger/configtx/${ch}.tx
 
     docker exec $1 mv ${ch}.block /shared/
     `).join('')}
@@ -46,26 +46,26 @@ function joinchannel() {
 function setanchor() {
     ${this.options.channels.map(ch => `
     echo "Creating ${ch} anchor block in peer $1"
-    docker exec $1 peer channel update  -o orderer.insitor.demo:7050 -c ${ch} -f /etc/hyperledger/configtx/$1.${ch}.tx
+    docker exec $1 peer channel update  -o orderer.insitor.lab:7050 -c ${ch} -f /etc/hyperledger/configtx/$1.${ch}.tx
 
     `).join('')}
 }
 
 function registeradmin() {
-    node $PROJECT_ROOT/node_modules/@worldsibu/convector-tool-dev-env/dist/command.js add -admin admin adminpw $2 -k "${this.options.networkRootPath}/.hfc-$1" -p "${this.options.networkRootPath}/$1.network-profile.yaml"
+    node $PROJECT_ROOT/node_modules/@worldsibu/convector-tool-dev-env/dist/command.js add-admin admin adminpw $2 -k "${this.options.networkRootPath}/.hfc-$1" -p "${this.options.networkRootPath}/network-profiles/$1.network-profile.yaml"
 }
 
 function registeruser() {
-    node $PROJECT_ROOT/node_modules/@worldsibu/convector-tool-dev-env/dist/command.js add -user $1 admin $4 -a $2.$3 -r client -k "${this.options.networkRootPath}/.hfc-$2" -p "${this.options.networkRootPath}/$2.network-profile.yaml"
+    node $PROJECT_ROOT/node_modules/@worldsibu/convector-tool-dev-env/dist/command.js add-user $1 admin $4 -a "org1" -r client -k "${this.options.networkRootPath}/.hfc-$2" -p "${this.options.networkRootPath}/network-profiles/$2.network-profile.yaml"
 }
 
-createchannel peer0.${this.options.organizations[0]}.insitor.demo
+createchannel peer0.${this.options.organizations[0]}.insitor.lab
 
 sleep 5
 
-${this.options.organizations.map(org => `joinchannel peer0.${org}.insitor.demo
+${this.options.organizations.map(org => `joinchannel peer0.${org}.insitor.lab
 `).join('')}
-${this.options.organizations.map(org => `setanchor peer0.${org}.insitor.demo
+${this.options.organizations.map(org => `setanchor peer0.${org}.insitor.lab
 `).join('')}
 
 sleep 5
@@ -73,14 +73,16 @@ sleep 5
 ${this.options.organizations.map(org => `
 echo "Registering admin for ${org}"
 registeradmin ${org} ${org}MSP
+wait
 `).join('')}
 
 
 ${Array.apply(null, { length: this.options.users }).map((user, index) => `
 
 ${this.options.organizations.map(org => `
-echo "Registering user${index} for ${org}"
-registeruser user${index} ${org} department1 ${org}MSP
+echo "Registering user${index + 1} for ${org}"
+registeruser user${index + 1} ${org} department1 ${org}MSP
+wait
 `).join('')}
 `).join('')}
 

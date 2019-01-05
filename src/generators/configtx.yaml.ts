@@ -31,15 +31,15 @@ Organizations:
   - &OrdererOrg
     Name: OrdererOrg
     ID: OrdererMSP
-    MSPDir: ./artifacts/crypto-config/ordererOrganizations/insitor.demo/msp
+    MSPDir: ./artifacts/crypto-config/ordererOrganizations/insitor.lab/msp
 
 ${this.options.orgs.map(x =>` 
   - &${x}
     Name: ${x}MSP
     ID: ${x}MSP
-    MSPDir: ./artifacts/crypto-config/peerOrganizations/${x}.insitor.demo/msp
+    MSPDir: ./artifacts/crypto-config/peerOrganizations/${x}.insitor.lab/msp
     AnchorPeers:
-      - Host: peer0.${x}.insitor.demo
+      - Host: peer0.${x}.insitor.lab
         Port: 7051
 `).join('')}
 
@@ -47,7 +47,7 @@ Orderer: &OrdererDefaults
   OrdererType: solo
 
   Addresses:
-    - orderer.insitor.demo:7050
+    - orderer.insitor.lab:7050
 
   BatchTimeout: 2s
 
