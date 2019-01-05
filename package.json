@@ -1,6 +1,6 @@
 {
   "name": "@worldsibu/insitor",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "The development environment toolset for blockchain projects",
   "main": "index.js",
   "files": [
