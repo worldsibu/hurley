@@ -1,6 +1,6 @@
 {
   "name": "@worldsibu/insitor",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "The development environment toolset for blockchain projects",
   "main": "index.js",
   "files": [
@@ -8,7 +8,7 @@
     "dist/*",
     "templates/*",
     "network-objects/*",
-    "scripts/*",
+    "tools/*",
     "docker-compose.yml",
     "package.json"
   ],
@@ -29,6 +29,8 @@
   "keywords": [
     "insitor",
     "development",
+    "hyperledger",
+    "fabric",
     "environment",
     "blockchain"
   ],
