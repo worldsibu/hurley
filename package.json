@@ -13,7 +13,7 @@
     "package.json"
   ],
   "bin": {
-    "hurley": "./dist/command.js"
+    "hurl": "./dist/command.js"
   },
   "scripts": {
     "clean": "rimraf dist",

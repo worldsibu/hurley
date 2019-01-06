@@ -7,20 +7,30 @@ export class NetworkRestartShOptions {
     users: number;
     channels: string[];
     organizations: string[];
+    envVars: {
+        FABRIC_VERSION: string,
+        THIRDPARTY_VERSION: string
+    };
 }
 export class NetworkRestartShGenerator extends BaseGenerator {
     success = join(this.path, 'cyptofilesgenerator.sh.successful');
     contents =
         `#!/bin/bash
+        set -e
 PROJECT_ROOT=${join(__dirname, '../../')}
 
 #clean
-docker stop $(docker ps -a | awk '$2~/hyperledger/ {print $1}') 
-docker rm -f $(docker ps -a | awk '$2~/hyperledger/ {print $1}') $(docker ps -a | awk '{ print $1,$2 }' | grep dev-peer | awk '{print $1 }') || true
-docker rmi -f $(docker images | grep dev-peer | awk '{print $3}') || true
-  
+
+ITEMS=$(docker ps -a | awk '$2~/hyperledger/ {print $1}') 
+
+if [ ! -z "$ITEMS" ]; then
+    docker stop $(docker ps -a | awk '$2~/hyperledger/ {print $1}') 
+    docker rm -f $(docker ps -a | awk '$2~/hyperledger/ {print $1}') $(docker ps -a | awk '{ print $1,$2 }' | grep dev-peer | awk '{print $1 }') || true
+    docker rmi -f $(docker images | grep dev-peer | awk '{print $3}') || true
+fi
+
 # start
-COMPOSE_PROJECT_NAME=net FABRIC_VERSION=x86_64-1.1.0 THIRDPARTY_VERSION=x86_64-0.4.6 docker-compose -f ${this.options.networkRootPath}/docker-compose.yaml up -d
+COMPOSE_PROJECT_NAME=net FABRIC_VERSION=${this.options.envVars.FABRIC_VERSION} THIRDPARTY_VERSION=${this.options.envVars.THIRDPARTY_VERSION} docker-compose -f ${this.options.networkRootPath}/docker-compose.yaml up -d
 
 # init
 

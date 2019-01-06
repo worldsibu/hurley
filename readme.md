@@ -19,34 +19,36 @@ npm i -g @worldsibu/hurley
 
 ```bash
 # Start a new blockchain network with 2 organizations, 2 users per organization, and 1 channel, localted at ~/Home/hyperledger-fabric-network
-hurley new
+hurl new
 
 # Clean every blockchain network deployment component
-hurley clean
+hurl clean
 ```
 
 ## Details
 
-### hurley new
+### hurl new
 
 Create a new blockchain network in your computer.
 
 ```bash
 # New project
-hurley new
+hurl new
     [-o -organizations <amount-of-organizations>]
     [-u -users <users-per-organization>]
     [-c -channels <amount-of-channels>]
     [-p -path <path-to-deploy >] # defaults to ~/Home/hyperledger-fabric-network
 ```
 
-### hurley clean
+### hurl clean
 
 Clear your environment from all the components.
 
 ```bash
-hurley clean
+hurl clean
 ```
+
+## Integrate to your development flow
 
 ## Roadmap 🗺
 

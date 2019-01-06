@@ -11,6 +11,7 @@ export class CryptoGeneratorShGenerator extends BaseGenerator {
   success = join(this.path, 'cyptofilesgenerator.sh.successful');
   contents = `
   #!/bin/bash
+  set -e
   ROOT_DIR=${join(__dirname, '../../')}
   BIN=$ROOT_DIR/tools
   NETWORK_ROOT=${this.options.networkRootPath}

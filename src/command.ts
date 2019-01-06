@@ -13,16 +13,14 @@ const tasks = {
     async cleanNetwork() {
         return await CLI.cleanNetwork();
     },
-    async installChaincode(chaincode: string, path: string) {
-        chaincode = chaincode.replace(/[^a-zA-Z ]/g, '');
-        return await CLI.installChaincode(chaincode, path);
+    async installChaincode(chaincode: string, language: string, channel?: string,
+        version?: string, params?: string, path?: string) {
+        return await CLI.installChaincode(chaincode, language, channel, version, params, path);
     },
     async upgradeChaincode(chaincode: string, path: string) {
-        chaincode = chaincode.replace(/[^a-zA-Z ]/g, '');
         return await CLI.upgradeChaincode(chaincode, path);
     },
     async invokeChaincode(chaincode: string, fn: string) {
-        chaincode = chaincode.replace(/[^a-zA-Z ]/g, '');
         return await CLI.invokeChaincode(chaincode, fn);
     },
 };
@@ -55,15 +53,22 @@ program
     });
 
 program
-    .command('install <chaincode> <path>')
-    // .option('-c, --chaincode <chaincode>', 'Default Chaincode Name')
-    .action(async (chaincode: string, path: string, cmd: any) => {
+    .command('install <name> <language>')
+    .option('-C, --channel <channel>', 'Channel name')
+    .option('-ctor, --ctor <constructor>', 'Smart contract constructor params')
+    .action(async (name: string, language: string, cmd: any) => {
         await tasks.installChaincode(
-            chaincode,
-            path);
+            name,
+            language,
+            cmd.channel,
+            '1.0',
+            cmd.ctor);
     });
+
+//chaincode: string, language: string, channel?: string,
+// version?: string, params?: string, path?: string 
 program
-    .command('upgrade <chaincode> <path>')
+    .command('upgrade <chaincode> <chaincodeversion> <path>')
     // .option('-c, --chaincode <chaincode>', 'Default Chaincode Name')
     .action(async (chaincode: string, path: string, cmd: any) => {
         await tasks.upgradeChaincode(

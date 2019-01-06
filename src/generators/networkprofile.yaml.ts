@@ -7,6 +7,7 @@ export class NetworkProfileYamlGeneratorOptions {
     networkRootPath: string;
     channels: string[];
     orgs: string[];
+    insideDocker: boolean;
 }
 export class NetworkProfileYamlGenerator extends BaseGenerator {
     contents =
@@ -16,9 +17,9 @@ version: "1.0"
 client:
     organization: ${this.options.org}MSP
     credentialStore:
-        path: ${this.options.networkRootPath}/.hfc-${this.options.org}
+        path: ${this.options.insideDocker ? `/config` : `${this.options.networkRootPath}/.hfc-${this.options.org}`} 
         cryptoStore:
-            path: ${this.options.networkRootPath}/.hfc-${this.options.org}
+            path: ${this.options.insideDocker ? `/config` : `${this.options.networkRootPath}/.hfc-${this.options.org}`} 
 
 channels:${this.options.channels.map(channel => `
     ${channel}:
@@ -47,7 +48,7 @@ organizations:${this.options.orgs.map(cOrg => `
 `).join('')}
 orderers:
     orderer.hurley.lab:
-        url: grpc://localhost:7050
+        url: grpc://${this.options.insideDocker ? `orderer.hurley.lab` : 'localhost'}:7050
         grpcOptions:
             ssl-target-name-override: orderer.hurley.lab
             grpc-max-send-message-length: 15
@@ -56,8 +57,8 @@ orderers:
 
 peers:${this.options.orgs.map((cOrg, index) => `
     peer0.${cOrg}.hurley.lab:
-        url: grpc://localhost:7${index}51
-        eventUrl: grpc://localhost:7${index}52
+        url: grpc://${this.options.insideDocker ? `peer0.${cOrg}.hurley.lab` : 'localhost'}:7${index}51
+        eventUrl: grpc://${this.options.insideDocker ? `peer0.${cOrg}.hurley.lab` : 'localhost'}:7${index}52
         grpcOptions:
             ssl-target-name-override: peer0.${cOrg}.hurley.lab
             grpc.keepalive_time_ms: 600000
@@ -66,7 +67,7 @@ peers:${this.options.orgs.map((cOrg, index) => `
 `).join('')}
 certificateAuthorities:${this.options.orgs.map((cOrg, index) => `
     ca.${cOrg}.hurley.lab:
-        url: http://localhost:7${index}54
+        url: http://${this.options.insideDocker ? `ca.${cOrg}.hurley.lab` : 'localhost'}:7${index}54
         httpOptions:
             verify: false
         tlsCACerts:
