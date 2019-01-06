@@ -34,9 +34,10 @@ export class CLI {
         await cli.installChaincode(chaincode, language, channel, version, params, path);
         return cli;
     }
-    static async upgradeChaincode(chaincode: string, path: string) {
+    static async upgradeChaincode(chaincode: string, language: string, channel?: string,
+        version?: string, params?: string, path?: string) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.upgradeChaincode(chaincode, path);
+        await cli.upgradeChaincode(chaincode, language, channel, version, params, path);
         return cli;
     }
     static async invokeChaincode(chaincode: string, fn: string) {
@@ -247,9 +248,34 @@ export class ChaincodeCLI {
 
         this.analytics.trackChaincodeInstall(`CHAINCODE=${chaincode}`);
     }
-    public async upgradeChaincode(chaincode: string, path: string) {
-        // let model = new ModelModel(this.chaincode, this.name, true);
-        // await model.save();
+    public async upgradeChaincode(chaincode: string, language: string, channel?: string,
+        version?: string, params?: string, path?: string) {
+        const homedir = require('os').homedir();
+        path = path ? join(homedir, path) : join(homedir, this.networkRootPath);
+
+        let existConfig = await ExistNetworkConfig(path);
+
+        if (!existConfig) {
+            l('Network configuration does not exist. Be sure to first create a new network with `hurley new`');
+            return;
+        }
+        let config = await LoadNetworkConfig(path);
+
+        let { orgs } = buildNetworkConfig(config);
+
+        let chaincodeGenerator = new ChaincodeGenerator(chaincode, {
+            channel,
+            language,
+            version,
+            networkRootPath: path,
+            organizations: orgs,
+            params,
+            hyperledgerVersion: config.hyperledgerVersion
+        });
+
+        await chaincodeGenerator.save();
+        await chaincodeGenerator.upgrade();
+
         this.analytics.trackChaincodeUpgrade(`CHAINCODE=${chaincode}`);
     }
     public async invokeChaincode(chaincode: string, fn: string) {

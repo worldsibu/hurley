@@ -60,7 +60,6 @@ sleep 10
 
 echo "Upgrading Chaincode at ${this.options.orgs[0]}"
 
-echo "Instantiating Chaincode at ${this.options.orgs[0]}"
 echo "It may take a few minutes depending on the chaincode dependencies"
 export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/users/Admin@${this.options.orgs[0]}.hurley.lab/msp
 export CORE_PEER_ID=peer0.${this.options.orgs[0]}.hurley.lab

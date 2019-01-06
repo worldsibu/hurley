@@ -17,8 +17,9 @@ const tasks = {
         version?: string, params?: string, path?: string) {
         return await CLI.installChaincode(chaincode, language, channel, version, params, path);
     },
-    async upgradeChaincode(chaincode: string, path: string) {
-        return await CLI.upgradeChaincode(chaincode, path);
+    async upgradeChaincode(chaincode: string, language: string, channel?: string,
+        version?: string, params?: string, path?: string) {
+        return await CLI.upgradeChaincode(chaincode, language, channel, version, params, path);
     },
     async invokeChaincode(chaincode: string, fn: string) {
         return await CLI.invokeChaincode(chaincode, fn);
@@ -68,12 +69,16 @@ program
 //chaincode: string, language: string, channel?: string,
 // version?: string, params?: string, path?: string 
 program
-    .command('upgrade <chaincode> <chaincodeversion> <path>')
-    // .option('-c, --chaincode <chaincode>', 'Default Chaincode Name')
-    .action(async (chaincode: string, path: string, cmd: any) => {
+    .command('upgrade <name> <language> <ver>')
+    .option('-C, --channel <channel>', 'Channel name')
+    .option('-ctor, --ctor <constructor>', 'Smart contract constructor params')
+    .action(async (name: string, language: string, ver: string, cmd: any) => {
         await tasks.upgradeChaincode(
-            chaincode,
-            path);
+            name,
+            language,
+            cmd.channel,
+            ver,
+            cmd.ctor);
     });
 program
     .command('invoke <chaincode>')

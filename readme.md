@@ -37,7 +37,6 @@ hurl new
     [-o -organizations <amount-of-organizations>]
     [-u -users <users-per-organization>]
     [-c -channels <amount-of-channels>]
-    [-p -path <path-to-deploy >] # defaults to $HOME/hyperledger-fabric-network
 ```
 
 ### hurl clean
@@ -47,6 +46,39 @@ Clear your environment from all the components.
 ```bash
 hurl clean
 ```
+
+### hurl install
+
+Hurley handles the lifecycle of your chaincodes through `install` and `upgrade` commands.
+
+Be sure to run `hurl install` inside the folder with the source code you want to install.
+
+```bash
+hurl install <chaincode> <language> 
+    [-C --channel <channel>] # Defaults to ch1
+    [-ctor --ctor <constructor>] # The constructor for the install function. Defaults to '{"Args":["init",""]}'
+```
+
+Language options:
+
+* node
+* golang
+
+### hurl upgrade
+
+Be sure to run `hurl upgrade` inside the folder with the source code you want to install.
+
+```bash
+hurl upgrade <chaincode> <language> <version>
+    [-C --channel <channel>] # Defaults to ch1
+    [-ctor --ctor <constructor>] # The constructor for the install function. Defaults to '{"Args":["init",""]}'
+```
+
+Language options:
+
+* node
+* golang
+
 
 ## Integrate to your development flow
 
