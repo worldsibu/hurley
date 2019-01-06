@@ -17,9 +17,9 @@ version: "1.0"
 client:
     organization: ${this.options.org}MSP
     credentialStore:
-        path: ${this.options.insideDocker ? `/config` : `${this.options.networkRootPath}/.hfc-${this.options.org}`} 
+        path: ${this.options.insideDocker ? `/config/.hfc-${this.options.org}` : `${this.options.networkRootPath}/.hfc-${this.options.org}`} 
         cryptoStore:
-            path: ${this.options.insideDocker ? `/config` : `${this.options.networkRootPath}/.hfc-${this.options.org}`} 
+            path: ${this.options.insideDocker ? `/config/.hfc-${this.options.org}` : `${this.options.networkRootPath}/.hfc-${this.options.org}`} 
 
 channels:${this.options.channels.map(channel => `
     ${channel}:
@@ -42,9 +42,9 @@ organizations:${this.options.orgs.map(cOrg => `
         certificateAuthorities:
             - ca.${cOrg}.hurley.lab
         adminPrivateKey:
-            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/users/Admin@${cOrg}.hurley.lab/msp/keystore/
+            path: ${this.options.insideDocker ? `/config` : this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/users/Admin@${cOrg}.hurley.lab/msp/keystore/
         signedCert:
-            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/users/Admin@${cOrg}.hurley.lab/msp/signcerts/
+            path: ${this.options.insideDocker ? `/config` : this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/users/Admin@${cOrg}.hurley.lab/msp/signcerts/
 `).join('')}
 orderers:
     orderer.hurley.lab:
@@ -53,25 +53,25 @@ orderers:
             ssl-target-name-override: orderer.hurley.lab
             grpc-max-send-message-length: 15
         tlsCACerts:
-            path: ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
+            path: ${this.options.insideDocker ? `/config` : this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
 
 peers:${this.options.orgs.map((cOrg, index) => `
     peer0.${cOrg}.hurley.lab:
-        url: grpc://${this.options.insideDocker ? `peer0.${cOrg}.hurley.lab` : 'localhost'}:7${index}51
-        eventUrl: grpc://${this.options.insideDocker ? `peer0.${cOrg}.hurley.lab` : 'localhost'}:7${index}52
+        url: grpc://${this.options.insideDocker ? `peer0.${cOrg}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7051' : `7${index}51`}
+        eventUrl: grpc://${this.options.insideDocker ? `peer0.${cOrg}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7052' : `7${index}52`}
         grpcOptions:
             ssl-target-name-override: peer0.${cOrg}.hurley.lab
             grpc.keepalive_time_ms: 600000
         tlsCACerts:
-            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/peers/peer0.${cOrg}.hurley.lab/msp/tlscacerts/tlsca.${cOrg}.hurley.lab-cert.pem
+            path: ${this.options.insideDocker ? `/config` : this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/peers/peer0.${cOrg}.hurley.lab/msp/tlscacerts/tlsca.${cOrg}.hurley.lab-cert.pem
 `).join('')}
 certificateAuthorities:${this.options.orgs.map((cOrg, index) => `
     ca.${cOrg}.hurley.lab:
-        url: http://${this.options.insideDocker ? `ca.${cOrg}.hurley.lab` : 'localhost'}:7${index}54
+        url: http://${this.options.insideDocker ? `ca.${cOrg}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7054' : `7${index}54`}
         httpOptions:
             verify: false
         tlsCACerts:
-            path: ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/ca/ca.${cOrg}.hurley.lab-cert.pem
+            path: ${this.options.insideDocker ? `/config` : this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${cOrg}.hurley.lab/ca/ca.${cOrg}.hurley.lab-cert.pem
         registrar:
             - enrollId: admin
               enrollSecret: adminpw

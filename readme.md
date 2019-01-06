@@ -29,7 +29,7 @@ hurl clean
 
 ### hurl new
 
-Create a new blockchain network in your computer.
+Create a new blockchain network in your computer. The first time you execute it, Hurley will check for Hyperledger Fabric's binaries and Container Images.
 
 ```bash
 # New project
@@ -37,7 +37,7 @@ hurl new
     [-o -organizations <amount-of-organizations>]
     [-u -users <users-per-organization>]
     [-c -channels <amount-of-channels>]
-    [-p -path <path-to-deploy >] # defaults to ~/Home/hyperledger-fabric-network
+    [-p -path <path-to-deploy >] # defaults to $HOME/hyperledger-fabric-network
 ```
 
 ### hurl clean
@@ -49,6 +49,19 @@ hurl clean
 ```
 
 ## Integrate to your development flow
+
+Everything you need will be hosted in the Network Folder (default `$HOME/hyperledger-fabric-network`). You can use all the files in this folder to consume the network, whether in your machine or in a Docker container.
+
+### Crypto materials for your users
+
+All the certificates and Application files for your default users reside in `$HOME/hyperledger-fabric-network/.hfc-*`.
+
+### Network profiles
+
+Your network profiles will be provisioned at `$HOME/hyperledger-fabric-network/network-profiles`.
+
+* The `*.network-profile.yaml` files: map your network if you run outside of the Docker network. For example, straight from your Machine.
+* The `*.network-profile.inside-docker.yaml` files: map your network if you run an application inside a docker container in the same network as the blockchain `hurley_dev_net`.
 
 ## Roadmap 🗺
 

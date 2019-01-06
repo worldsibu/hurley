@@ -143,8 +143,8 @@ export class NetworkCLI {
                     insideDocker: false
                 })).save();
             l(`Creating for ${org} inside Docker`);
-            await (new NetworkProfileYamlGenerator(`${org}.network-profile.yaml`,
-                join(path, './inside-docker'), {
+            await (new NetworkProfileYamlGenerator(`${org}.network-profile.inside-docker.yaml`,
+                join(path, './network-profiles'), {
                     org,
                     orgs,
                     networkRootPath: path,
