@@ -1,8 +1,8 @@
 // tslint:disable:max-line-length
 import { BaseGenerator } from './base';
-import { join } from 'path';
+import { join, dirname } from 'path';
 
-const devEnvPath = require.resolve('@worldsibu/convector-tool-dev-env');
+const devEnvPath = dirname(require.resolve('@worldsibu/convector-tool-dev-env'));
 
 export class NetworkRestartShOptions {
     networkRootPath: string;
@@ -63,11 +63,11 @@ function setanchor() {
 }
 
 function registeradmin() {
-    node ${devEnvPath}/dist/command.js add-admin admin adminpw $2 -k "${this.options.networkRootPath}/.hfc-$1" -p "${this.options.networkRootPath}/network-profiles/$1.network-profile.yaml"
+    node ${devEnvPath}/command.js add-admin admin adminpw $2 -k "${this.options.networkRootPath}/.hfc-$1" -p "${this.options.networkRootPath}/network-profiles/$1.network-profile.yaml"
 }
 
 function registeruser() {
-    node ${devEnvPath}/dist/command.js add-user $1 admin $4 -a "org1" -r client -k "${this.options.networkRootPath}/.hfc-$2" -p "${this.options.networkRootPath}/network-profiles/$2.network-profile.yaml"
+    node ${devEnvPath}/command.js add-user $1 admin $4 -a "org1" -r client -k "${this.options.networkRootPath}/.hfc-$2" -p "${this.options.networkRootPath}/network-profiles/$2.network-profile.yaml"
 }
 
 createchannel peer0.${this.options.organizations[0]}.hurley.lab
