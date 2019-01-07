@@ -2,6 +2,8 @@
 import { BaseGenerator } from './base';
 import { join } from 'path';
 
+const devEnvPath = require.resolve('@worldsibu/convector-tool-dev-env');
+
 export class NetworkRestartShOptions {
     networkRootPath: string;
     users: number;
@@ -14,10 +16,9 @@ export class NetworkRestartShOptions {
 }
 export class NetworkRestartShGenerator extends BaseGenerator {
     success = join(this.path, 'cyptofilesgenerator.sh.successful');
-    contents =
-        `#!/bin/bash
-        set -e
-PROJECT_ROOT=${join(__dirname, '../../')}
+    contents = `
+#!/bin/bash
+set -e
 
 #clean
 
@@ -62,11 +63,11 @@ function setanchor() {
 }
 
 function registeradmin() {
-    node $PROJECT_ROOT/node_modules/@worldsibu/convector-tool-dev-env/dist/command.js add-admin admin adminpw $2 -k "${this.options.networkRootPath}/.hfc-$1" -p "${this.options.networkRootPath}/network-profiles/$1.network-profile.yaml"
+    node ${devEnvPath}/dist/command.js add-admin admin adminpw $2 -k "${this.options.networkRootPath}/.hfc-$1" -p "${this.options.networkRootPath}/network-profiles/$1.network-profile.yaml"
 }
 
 function registeruser() {
-    node $PROJECT_ROOT/node_modules/@worldsibu/convector-tool-dev-env/dist/command.js add-user $1 admin $4 -a "org1" -r client -k "${this.options.networkRootPath}/.hfc-$2" -p "${this.options.networkRootPath}/network-profiles/$2.network-profile.yaml"
+    node ${devEnvPath}/dist/command.js add-user $1 admin $4 -a "org1" -r client -k "${this.options.networkRootPath}/.hfc-$2" -p "${this.options.networkRootPath}/network-profiles/$2.network-profile.yaml"
 }
 
 createchannel peer0.${this.options.organizations[0]}.hurley.lab
