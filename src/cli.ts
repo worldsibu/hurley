@@ -56,7 +56,7 @@ export class NetworkCLI {
 
     public async init(organizations?: number, users?: number, channels?: number, path?: string, inside?: boolean) {
         this.analytics.init();
-        this.initNetwork(organizations, users, channels, path);
+        this.initNetwork(organizations, users, channels, path, inside);
     }
 
     async initNetwork(
