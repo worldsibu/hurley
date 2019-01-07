@@ -32,9 +32,9 @@ if [ ! -z "$ITEMS" ]; then
 fi
 
 # start
-COMPOSE_PROJECT_NAME=net\
-FABRIC_VERSION=${this.options.envVars.FABRIC_VERSION}\
-THIRDPARTY_VERSION=${this.options.envVars.THIRDPARTY_VERSION}\
+COMPOSE_PROJECT_NAME=net \
+FABRIC_VERSION=${this.options.envVars.FABRIC_VERSION} \
+THIRDPARTY_VERSION=${this.options.envVars.THIRDPARTY_VERSION} \
 docker-compose -f ${this.options.networkRootPath}/docker-compose.yaml up -d
 
 # init
