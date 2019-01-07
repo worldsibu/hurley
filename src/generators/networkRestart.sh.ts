@@ -9,6 +9,7 @@ export class NetworkRestartShOptions {
     users: number;
     channels: string[];
     organizations: string[];
+    insideDocker: boolean;
     envVars: {
         FABRIC_VERSION: string,
         THIRDPARTY_VERSION: string
@@ -31,7 +32,10 @@ if [ ! -z "$ITEMS" ]; then
 fi
 
 # start
-COMPOSE_PROJECT_NAME=net FABRIC_VERSION=${this.options.envVars.FABRIC_VERSION} THIRDPARTY_VERSION=${this.options.envVars.THIRDPARTY_VERSION} docker-compose -f ${this.options.networkRootPath}/docker-compose.yaml up -d
+COMPOSE_PROJECT_NAME=net
+FABRIC_VERSION=${this.options.envVars.FABRIC_VERSION}
+THIRDPARTY_VERSION=${this.options.envVars.THIRDPARTY_VERSION}
+docker-compose -f ${this.options.networkRootPath}/docker-compose.yaml up -d
 
 # init
 
@@ -63,11 +67,17 @@ function setanchor() {
 }
 
 function registeradmin() {
-    node ${devEnvPath}/command.js add-admin admin adminpw $2 -k "${this.options.networkRootPath}/.hfc-$1" -p "${this.options.networkRootPath}/network-profiles/$1.network-profile.yaml"
+    node ${devEnvPath}/command.js add-admin admin adminpw $2\
+        -k "${this.options.networkRootPath}/.hfc-$1"\
+        -p "${this.options.networkRootPath}/network-profiles/$1.network-profile${this.options.insideDocker ? '.inside-docker' : ''}.yaml"
 }
 
 function registeruser() {
-    node ${devEnvPath}/command.js add-user $1 admin $4 -a "org1" -r client -k "${this.options.networkRootPath}/.hfc-$2" -p "${this.options.networkRootPath}/network-profiles/$2.network-profile.yaml"
+    node ${devEnvPath}/command.js add-user $1 admin $4\
+        -a "org1"\
+        -r client\
+        -k "${this.options.networkRootPath}/.hfc-$2"\
+        -p "${this.options.networkRootPath}/network-profiles/$2.network-profile${this.options.insideDocker ? '.inside-docker' : ''}.yaml"
 }
 
 createchannel peer0.${this.options.organizations[0]}.hurley.lab

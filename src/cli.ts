@@ -16,10 +16,10 @@ import { SaveNetworkConfig, LoadNetworkConfig, ExistNetworkConfig } from './util
 
 export class CLI {
     static async createNetwork(organizations?: string, users?: string, channels?: string,
-        path?: string) {
+        path?: string, inside?: boolean) {
         const cli = new NetworkCLI();
         await cli.init(Number.parseInt(organizations), Number.parseInt(users),
-            Number.parseInt(channels), path);
+            Number.parseInt(channels), path, inside);
         return cli;
     }
     static async cleanNetwork() {
@@ -54,12 +54,18 @@ export class NetworkCLI {
         this.analytics = new Analytics();
     }
 
-    public async init(organizations?: number, users?: number, channels?: number, path?: string) {
+    public async init(organizations?: number, users?: number, channels?: number, path?: string, inside?: boolean) {
         this.analytics.init();
         this.initNetwork(organizations, users, channels, path);
     }
 
-    async initNetwork(organizations?: number, users?: number, channels?: number, path?: string) {
+    async initNetwork(
+        organizations?: number,
+        users?: number,
+        channels?: number,
+        path?: string,
+        insideDocker?: boolean
+    ) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
 
@@ -95,6 +101,7 @@ export class NetworkCLI {
             networkRootPath: path,
             channels: chs,
             users,
+            insideDocker,
             envVars: {
                 FABRIC_VERSION: '1.3.0',
                 THIRDPARTY_VERSION: '0.4.13'

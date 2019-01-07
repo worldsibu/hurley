@@ -7,8 +7,8 @@ const fixPath = p => resolve(process.cwd(), p);
 
 const tasks = {
     async createNetwork(organizations?: string, users?: string, channels?: string,
-        path?: string) {
-        return await CLI.createNetwork(organizations, users, channels, path);
+        path?: string, inside?: boolean) {
+        return await CLI.createNetwork(organizations, users, channels, path, inside);
     },
     async cleanNetwork() {
         return await CLI.cleanNetwork();
@@ -33,6 +33,7 @@ program
     .option('-o, --organizations <organizations>', 'Amount of organizations')
     .option('-u, --users <users>', 'Users per organization')
     .option('-p, --path <path>', 'Path to deploy the network')
+    .option('-i, --inside', 'Optimized for running inside the docker compose network')
     // .option('-p, --peers <peers>', 'Peers per organization')
     .action(async (cmd: any) => {
         if (cmd) {
@@ -40,7 +41,7 @@ program
                 !cmd.organizations || (cmd.organizations <= 2 || cmd.organizations >= 7) ? 2 : cmd.organizations,
                 !cmd.users || (cmd.users <= 1 || cmd.users >= 10) ? 1 : cmd.users,
                 !cmd.channels || (cmd.channels <= 1 || cmd.channels >= 7) ? 1 : cmd.channels,
-                cmd.path
+                cmd.path, !!cmd.inside
             );
         } else {
             await tasks.createNetwork();
