@@ -1,5 +1,5 @@
 import { SysWrapper } from './utils/sysWrapper';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { Analytics } from './utils/analytics';
 import * as Insight from 'insight';
 import { ConfigTxYamlGenerator } from './generators/configtx.yaml';
@@ -61,7 +61,7 @@ export class NetworkCLI {
 
     async initNetwork(organizations?: number, users?: number, channels?: number, path?: string) {
         const homedir = require('os').homedir();
-        path = path ? join(homedir, path) : join(homedir, this.networkRootPath);
+        path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
 
         let { orgs, chs, usrs } = buildNetworkConfig({ organizations, channels, users });
 
@@ -96,8 +96,8 @@ export class NetworkCLI {
             channels: chs,
             users,
             envVars: {
-                FABRIC_VERSION: 'x86_64-1.3.0',
-                THIRDPARTY_VERSION: 'x86_64-0.4.13'
+                FABRIC_VERSION: '1.3.0',
+                THIRDPARTY_VERSION: '0.4.13'
             }
         });
         let binariesDownload = new DownloadFabricBinariesGenerator('binaries.sh', path, {
