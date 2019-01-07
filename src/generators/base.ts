@@ -13,7 +13,7 @@ export abstract class BaseGenerator {
         return join(this.path, this.filename);
     }
     run() {
-        SysWrapper.execContent(this.contents);
+        return SysWrapper.execContent(this.contents);
     }
     check() {
         return SysWrapper.existsPath(this.success);

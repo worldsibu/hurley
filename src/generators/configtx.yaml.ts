@@ -7,26 +7,6 @@ export class ConfigTxYamlGeneratorOptions {
 }
 export class ConfigTxYamlGenerator extends BaseGenerator {
   contents = `---
-Profiles:
-  OrgsOrdererGenesis:
-    Orderer:
-      <<: *OrdererDefaults
-      Organizations:
-        - *OrdererOrg
-    Consortiums:
-      SampleConsortium:
-        Organizations:
-          ${this.options.orgs.map(x => `- *${x}
-          `).join('')}
-
-  OrgsChannel:
-    Consortium: SampleConsortium
-    Application:
-      <<: *ApplicationDefaults
-      Organizations:
-        ${this.options.orgs.map(x => `- *${x}
-        `).join('')}
-
 Organizations:
   - &OrdererOrg
     Name: OrdererOrg
@@ -60,6 +40,26 @@ Orderer: &OrdererDefaults
 
 Application: &ApplicationDefaults
   Organizations:
+
+Profiles:
+  OrgsOrdererGenesis:
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+    Consortiums:
+      SampleConsortium:
+        Organizations:
+          ${this.options.orgs.map(x => `- *${x}
+          `).join('')}
+
+  OrgsChannel:
+    Consortium: SampleConsortium
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        ${this.options.orgs.map(x => `- *${x}
+        `).join('')}
     `;
 
   constructor(filename: string, path: string, private options: ConfigTxYamlGeneratorOptions) {

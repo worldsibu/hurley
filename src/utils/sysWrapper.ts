@@ -1,9 +1,8 @@
-import memFs = require('mem-fs');
-import memFsEditor = require('mem-fs-editor');
 import * as ejs from 'ejs';
 import * as fs from 'fs-extra';
 import { exec } from 'shelljs';
-import { join } from 'path';
+import memFs = require('mem-fs');
+import memFsEditor = require('mem-fs-editor');
 
 export module SysWrapper {
   let d = console.log;
@@ -98,7 +97,7 @@ export module SysWrapper {
 
       return exec(
         simpleFileContent,
-        { silent: false }
+        { silent: false, shell: '/bin/bash' }
       );
     }
   }
@@ -106,7 +105,7 @@ export module SysWrapper {
   export async function execContent(content: any): Promise<void> {
     return exec(
       content,
-      { silent: false }
+      { silent: false, shell: '/bin/bash' }
     );
   }
 

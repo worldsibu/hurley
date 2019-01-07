@@ -6,15 +6,18 @@ export class CryptoGeneratorOptions {
   networkRootPath: string;
   orgs: string[];
   channels: string[];
+  envVars: {
+    FABRIC_VERSION: string;
+};
 }
 export class CryptoGeneratorShGenerator extends BaseGenerator {
   success = join(this.path, 'cyptofilesgenerator.sh.successful');
   contents = `
   #!/bin/bash
   set -e
-  ROOT_DIR=${join(__dirname, '../../')}
-  BIN=$ROOT_DIR/tools
+  ROOT_DIR=${join(__dirname, '../..')}
   NETWORK_ROOT=${this.options.networkRootPath}
+  BIN=$NETWORK_ROOT/fabric-binaries/${this.options.envVars.FABRIC_VERSION}/bin
   TARGET=$NETWORK_ROOT/artifacts
   
   export FABRIC_CFG_PATH=$NETWORK_ROOT

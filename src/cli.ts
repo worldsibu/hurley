@@ -85,7 +85,10 @@ export class NetworkCLI {
         let cryptoGenerator = new CryptoGeneratorShGenerator('generator.sh', path, {
             orgs,
             networkRootPath: path,
-            channels: chs
+            channels: chs,
+            envVars: {
+                FABRIC_VERSION: '1.3.0'
+            }
         });
         let networkRestart = new NetworkRestartShGenerator('restart.sh', path, {
             organizations: orgs,
