@@ -1,6 +1,7 @@
 import * as Insight from 'insight';
 import * as fs from 'fs-extra';
 import { join } from 'path';
+import { l } from './logs';
 
 /**
  * Intelligence for Convector CLI.
@@ -18,28 +19,29 @@ export class Analytics {
             pkg,
             optOut: undefined
         });
-        this.init();
     }
 
     /** Ask for permissions. */
-    init() {
+    async init() {
+        l('Hurley collects anonymous usage statistics to improve the tool over time');
         // this.insight.optOut = undefined;
-        // Ask for permission the first time
-        if (this.insight.optOut === undefined) {
-            // tslint:disable-next-line:max-line-length
-            this.insight.askPermission('May hurley anonymoysly report usage statistics to improve the tool over time?');
-            if (this.insight.optOut) {
-                this.permissionRejection();
-            } else {
-                this.permissionAcceptance();
-            }
-        } else {
-            if (this.insight.optOut) {
-                this.returnRejected();
-            } else {
-                this.returnAccepted();
-            }
-        }
+        // // Ask for permission the first time
+        // if (this.insight.optOut === undefined) {
+        //     // tslint:disable-next-line:max-line-length
+        //     this.insight.askPermission('May Hurley anonymously report usage statistics to improve the tool over time?');
+        //     if (this.insight.optOut) {
+        //         this.permissionRejection();
+        //     } else {
+        this.permissionAcceptance();
+        //     }
+        // } else {
+        //     if (this.insight.optOut) {
+        //         this.returnRejected();
+        //     } else {
+        //         this.returnAccepted();
+        //     }
+        // }
+        // await cb();
     }
 
     /** Log a network creation */
@@ -62,7 +64,7 @@ export class Analytics {
     trackChaincodeInvoke(label?: string) {
         this.track(CategoryEnum.CHAINCODE, ActionEnum.INVOKE, label);
     }
-    
+
 
     /** Explicit logging. */
     track(category: CategoryEnum, action: ActionEnum, label?: string) {

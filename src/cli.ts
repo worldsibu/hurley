@@ -55,6 +55,11 @@ export class NetworkCLI {
     }
 
     public async init(organizations?: number, users?: number, channels?: number, path?: string) {
+        this.analytics.init();
+        this.initNetwork(organizations, users, channels, path);
+    }
+
+    async initNetwork(organizations?: number, users?: number, channels?: number, path?: string) {
         const homedir = require('os').homedir();
         path = path ? join(homedir, path) : join(homedir, this.networkRootPath);
 
@@ -182,6 +187,7 @@ export class NetworkCLI {
             externalHyperledgerVersion: '0.4.6'
         });
     }
+
     public async clean() {
         let networkClean = new NetworkCleanShGenerator('clean.sh', 'na', null);
         await networkClean.run();

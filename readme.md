@@ -6,7 +6,7 @@ It is an open source project under an Apache 2.0 license to help you create Conv
 
 ## Prerequisites
 
-* [Node](https://nodejs.org/en/download/) 8.11.0 (other versions might work, but this is the one we use for development)
+* NPM
 * [Docker](https://www.docker.com/community-edition)
 
 ## Usage
@@ -14,6 +14,8 @@ It is an open source project under an Apache 2.0 license to help you create Conv
 ```bash
 npm i -g @worldsibu/hurley
 ```
+
+Hurley deploys Hyperledger Fabric 1.3.0 networks.
 
 ### Basic network management
 
@@ -79,7 +81,6 @@ Language options:
 * node
 * golang
 
-
 ## Integrate to your development flow
 
 Everything you need will be hosted in the Network Folder (default `$HOME/hyperledger-fabric-network`). You can use all the files in this folder to consume the network, whether in your machine or in a Docker container.
@@ -98,6 +99,11 @@ Your network profiles will be provisioned at `$HOME/hyperledger-fabric-network/n
 ## Roadmap 🗺
 
 Have ideas? Post them in the [Issues section](https://github.com/worldsibu/hurley/issues).
+
+Some ideas for future releases:
+
+* Hyperledger version select.
+* Support Hyperledger Sawtooth.
 
 ## Important ⚗️
 
