@@ -51,7 +51,7 @@ orderers:
         url: grpc://${this.options.insideDocker ? `orderer.hurley.lab` : 'localhost'}:7050
         grpcOptions:
             ssl-target-name-override: orderer.hurley.lab
-            grpc-max-send-message-length: 15
+            grpc-max-send-message-length: -1
         tlsCACerts:
             path: ${this.options.insideDocker ? `/config` : this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
 
