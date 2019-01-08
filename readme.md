@@ -80,6 +80,7 @@ Language options:
 
 * node
 * golang
+* If you are using <a href="https://github.com/worldsibu/convector" target="_blank">Convector Smart Contracts</a> be sure to package first the code through `npm run cc:package -- <your-chaincode> org1`
 
 ## Integrate to your development flow
 
@@ -103,6 +104,7 @@ Have ideas? Post them in the [Issues section](https://github.com/worldsibu/hurle
 Some ideas for future releases:
 
 * Hyperledger version select.
+* Invoke functions.
 * Support Hyperledger Sawtooth.
 
 ## Important ⚗️
