@@ -57,7 +57,7 @@ program
 program
     .command('install <name> <language>')
     .option('-C, --channel <channel>', 'Channel name')
-    .option('-ctor, --ctor <constructor>', 'Smart contract constructor params')
+    .option('-c, --ctor <constructor>', 'Smart contract constructor params')
     .option('-p, --path <path>', 'Path to deploy the network folder')
     .option('-P, --chaincode-path <path>', 'Path to chaincode package. Default to ./<name>')
     .action(async (name: string, language: string, cmd: any) => {
@@ -76,7 +76,7 @@ program
 program
     .command('upgrade <name> <language> <ver>')
     .option('-C, --channel <channel>', 'Channel name')
-    .option('-ctor, --ctor <constructor>', 'Smart contract constructor params')
+    .option('-c, --ctor <constructor>', 'Smart contract constructor params')
     .option('-p, --path <path>', 'Path to deploy the network folder')
     .option('-P, --chaincode-path <path>', 'Path to chaincode package. Default to ./<name>')
     .action(async (name: string, language: string, ver: string, cmd: any) => {

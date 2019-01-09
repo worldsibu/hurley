@@ -58,7 +58,7 @@ Be sure to run `hurl install` inside the folder with the source code you want to
 ```bash
 hurl install <chaincode> <language> 
     [-C --channel <channel>] # Defaults to ch1
-    [-ctor --ctor <constructor>] # The constructor for the install function. Defaults to '{"Args":["init",""]}'
+    [-c --ctor <constructor>] # The constructor for the install function. Defaults to '{"Args":["init",""]}'
 ```
 
 Language options:
@@ -73,7 +73,7 @@ Be sure to run `hurl upgrade` inside the folder with the source code you want to
 ```bash
 hurl upgrade <chaincode> <language> <version>
     [-C --channel <channel>] # Defaults to ch1
-    [-ctor --ctor <constructor>] # The constructor for the install function. Defaults to '{"Args":["init",""]}'
+    [-c --ctor <constructor>] # The constructor for the install function. Defaults to '{"Args":["init",""]}'
 ```
 
 Language options:
