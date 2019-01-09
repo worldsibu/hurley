@@ -2,8 +2,9 @@
 import * as program from 'commander';
 import { CLI } from './cli';
 import { resolve } from 'path';
+import * as updateNotifier from 'update-notifier';
 
-const fixPath = p => resolve(process.cwd(), p);
+const pkg = require('../package.json');
 
 const tasks = {
     async createNetwork(organizations?: string, users?: string, channels?: string,
@@ -97,5 +98,10 @@ program
             chaincode,
             cmd.fn);
     });
+
+updateNotifier({
+    pkg,
+    updateCheckInterval: 1000 * 60
+}).notify();
 
 program.parse(process.argv);
