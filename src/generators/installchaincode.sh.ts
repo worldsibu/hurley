@@ -50,9 +50,17 @@ export CORE_PEER_LOCALMSPID=${org}MSP
 export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/msp/tlscacerts/tlsca.${org}.hurley.lab-cert.pem
 
 ${this.options.language==='golang' ? `
-${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode install -n ${this.options.name} -v ${this.options.version} -p "go_temp_code" -l "${this.options.language}"
+${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode install\
+    -n ${this.options.name}\
+    -v ${this.options.version}\
+    -p "go_temp_code"\
+    -l "${this.options.language}"
 `:`
-${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode install -n ${this.options.name} -v ${this.options.version} -p "${this.options.currentPath}" -l "${this.options.language}"
+${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode install\
+    -n ${this.options.name}\
+    -v ${this.options.version}\
+    -p "${this.options.currentPath}"\
+    -l "${this.options.language}"
 `}
 
 echo "Installed Chaincode at ${org}"
@@ -69,7 +77,14 @@ export CORE_PEER_LOCALMSPID=${this.options.orgs[0]}MSP
 export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/msp/tlscacerts/tlsca.${this.options.orgs[0]}.hurley.lab-cert.pem
 
 
-${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode instantiate -C ${this.options.channel} -n ${this.options.name} -v ${this.options.version} -c '${this.options.params}' -P "${this.getPolicy(this.options.orgs)}" -o localhost:7050 --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
+${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode instantiate \
+    -C ${this.options.channel}\
+    -n ${this.options.name}\
+    -v ${this.options.version}\
+    -c '${this.options.params}'\
+    -P "${this.getPolicy(this.options.orgs)}"\
+    -o localhost:7050\
+    --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
 
 echo "Instantiated Chaincode at ${this.options.orgs[0]}"
 

@@ -14,12 +14,12 @@ const tasks = {
         return await CLI.cleanNetwork();
     },
     async installChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string) {
-        return await CLI.installChaincode(chaincode, language, channel, version, params, path);
+        version?: string, params?: string, path?: string, ccPath?: string) {
+        return await CLI.installChaincode(chaincode, language, channel, version, params, path, ccPath);
     },
     async upgradeChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string) {
-        return await CLI.upgradeChaincode(chaincode, language, channel, version, params, path);
+        version?: string, params?: string, path?: string, ccPath?: string) {
+        return await CLI.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath);
     },
     async invokeChaincode(chaincode: string, fn: string) {
         return await CLI.invokeChaincode(chaincode, fn);
@@ -58,13 +58,17 @@ program
     .command('install <name> <language>')
     .option('-C, --channel <channel>', 'Channel name')
     .option('-ctor, --ctor <constructor>', 'Smart contract constructor params')
+    .option('-p, --path <path>', 'Path to deploy the network folder')
+    .option('-P, --chaincode-path <path>', 'Path to chaincode package. Default to ./<name>')
     .action(async (name: string, language: string, cmd: any) => {
         await tasks.installChaincode(
             name,
             language,
             cmd.channel,
             '1.0',
-            cmd.ctor);
+            cmd.ctor,
+            cmd.path,
+            cmd.chaincodePath);
     });
 
 //chaincode: string, language: string, channel?: string,
@@ -73,13 +77,17 @@ program
     .command('upgrade <name> <language> <ver>')
     .option('-C, --channel <channel>', 'Channel name')
     .option('-ctor, --ctor <constructor>', 'Smart contract constructor params')
+    .option('-p, --path <path>', 'Path to deploy the network folder')
+    .option('-P, --chaincode-path <path>', 'Path to chaincode package. Default to ./<name>')
     .action(async (name: string, language: string, ver: string, cmd: any) => {
         await tasks.upgradeChaincode(
             name,
             language,
             cmd.channel,
             ver,
-            cmd.ctor);
+            cmd.ctor,
+            cmd.path,
+            cmd.chaincodePath);
     });
 program
     .command('invoke <chaincode>')
