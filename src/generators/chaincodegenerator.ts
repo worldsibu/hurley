@@ -1,4 +1,4 @@
-import { BaseGenerator } from './base';
+import { resolve } from 'path';
 import { InstallChaincodeShGenerator } from './installchaincode.sh';
 import { UpgradeChaincodeShGenerator } from './upgradechaincode.sh';
 import { l } from '../utils/logs';
@@ -6,7 +6,7 @@ import { l } from '../utils/logs';
 export class ChaincodeGenerator {
     installScript: InstallChaincodeShGenerator;
     upgradeScript: UpgradeChaincodeShGenerator;
-    currentPath = process.cwd();
+    currentPath = this.options.path ? resolve(process.cwd(), this.options.path) : process.cwd();
 
     constructor(public name: string, private options: {
         organizations: string[];
@@ -16,6 +16,7 @@ export class ChaincodeGenerator {
         params: string;
         version?: string;
         hyperledgerVersion: string;
+        path?: string;
     }) {
         this.installScript = new InstallChaincodeShGenerator('installscript.sh', options.networkRootPath, {
             channel: this.options.channel || 'ch1',

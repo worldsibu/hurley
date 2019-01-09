@@ -29,15 +29,15 @@ export class CLI {
     }
 
     static async installChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string) {
+        version?: string, params?: string, path?: string, ccPath?: string) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.installChaincode(chaincode, language, channel, version, params, path);
+        await cli.installChaincode(chaincode, language, channel, version, params, path, ccPath);
         return cli;
     }
     static async upgradeChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string) {
+        version?: string, params?: string, path?: string, ccPath?: string) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.upgradeChaincode(chaincode, language, channel, version, params, path);
+        await cli.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath);
         return cli;
     }
     static async invokeChaincode(chaincode: string, fn: string) {
@@ -193,8 +193,8 @@ export class NetworkCLI {
         l(`You can find the network topology (ports, names) here: ${join(path, 'docker-compose.yaml')}`);
         await SaveNetworkConfig(path, {
             organizations, users, channels, path,
-            hyperledgerVersion: '1.1.0',
-            externalHyperledgerVersion: '0.4.6'
+            hyperledgerVersion: '1.3.0',
+            externalHyperledgerVersion: '0.4.13'
         });
     }
 
@@ -235,7 +235,7 @@ export class ChaincodeCLI {
         this.analytics = new Analytics();
     }
     public async installChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string) {
+        version?: string, params?: string, path?: string, ccPath?: string) {
         const homedir = require('os').homedir();
         path = path ? join(homedir, path) : join(homedir, this.networkRootPath);
 
@@ -250,6 +250,7 @@ export class ChaincodeCLI {
         let { orgs } = buildNetworkConfig(config);
 
         let chaincodeGenerator = new ChaincodeGenerator(chaincode, {
+            path: ccPath,
             channel,
             language,
             version,
@@ -265,7 +266,7 @@ export class ChaincodeCLI {
         this.analytics.trackChaincodeInstall(`CHAINCODE=${chaincode}`);
     }
     public async upgradeChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string) {
+        version?: string, params?: string, path?: string, ccPath?: string) {
         const homedir = require('os').homedir();
         path = path ? join(homedir, path) : join(homedir, this.networkRootPath);
 
@@ -280,6 +281,7 @@ export class ChaincodeCLI {
         let { orgs } = buildNetworkConfig(config);
 
         let chaincodeGenerator = new ChaincodeGenerator(chaincode, {
+            path: ccPath,
             channel,
             language,
             version,
