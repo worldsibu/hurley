@@ -79,9 +79,9 @@ echo "Upgraded Chaincode at ${this.options.orgs[0]}"
     }
 
     getPolicy(orgs: string[]): string {
-        return `AND(${
+        return `OR(${
             orgs
-                .map(org => `'${org}.member'`)
+                .map(org => `'${org}'`)
                 .join(',')
             })`;
     }

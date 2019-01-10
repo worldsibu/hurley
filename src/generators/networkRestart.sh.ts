@@ -102,7 +102,7 @@ ${Array.apply(null, { length: this.options.users }).map((user, index) => `
 
 ${this.options.organizations.map(org => `
 echo "Registering user${index + 1} for ${org}"
-registeruser user${index + 1} ${org} department1 ${org}MSP
+registeruser user${index + 1} ${org} department1 ${org}MSP 
 wait
 `).join('')}
 `).join('')}

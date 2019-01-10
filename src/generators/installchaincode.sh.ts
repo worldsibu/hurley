@@ -82,9 +82,10 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
     -n ${this.options.name}\
     -v ${this.options.version}\
     -c '${this.options.params}'\
-    -P "${this.getPolicy(this.options.orgs)}"\
     -o localhost:7050\
     --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
+
+    # -P "${this.getPolicy(this.options.orgs)}"\
 
 echo "Instantiated Chaincode at ${this.options.orgs[0]}"
 
@@ -97,9 +98,9 @@ echo "Instantiated Chaincode at ${this.options.orgs[0]}"
     }
 
     getPolicy(orgs: string[]): string {
-        return `AND(${
+        return `OR(${
             orgs
-                .map(org => `'${org}.member'`)
+                .map(org => `'${org}.client'`)
                 .join(',')
             })`;
     }
