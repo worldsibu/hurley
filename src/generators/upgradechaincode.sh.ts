@@ -67,7 +67,15 @@ export CORE_PEER_ADDRESS=localhost:7051
 export CORE_PEER_LOCALMSPID=${this.options.orgs[0]}MSP
 export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/msp/tlscacerts/tlsca.${this.options.orgs[0]}.hurley.lab-cert.pem
 
-${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode upgrade -C ${this.options.channel} -n ${this.options.name} -v ${this.options.version} -c '${this.options.params}' -P "${this.getPolicy(this.options.orgs)}" -o localhost:7050 --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
+${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode upgrade\
+    -C ${this.options.channel}\
+    -n ${this.options.name}\
+    -v ${this.options.version}\
+    -c '${this.options.params}'\
+    -o localhost:7050\
+    --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
+
+    # -P "${this.getPolicy(this.options.orgs)}"\
 
 echo "Upgraded Chaincode at ${this.options.orgs[0]}"
 
@@ -81,7 +89,7 @@ echo "Upgraded Chaincode at ${this.options.orgs[0]}"
     getPolicy(orgs: string[]): string {
         return `OR(${
             orgs
-                .map(org => `'${org}'`)
+                .map(org => `'${org}.client'`)
                 .join(',')
             })`;
     }
