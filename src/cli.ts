@@ -237,7 +237,7 @@ export class ChaincodeCLI {
     public async installChaincode(chaincode: string, language: string, channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string) {
         const homedir = require('os').homedir();
-        path = path ? join(homedir, path) : join(homedir, this.networkRootPath);
+        path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
 
         let existConfig = await ExistNetworkConfig(path);
 
@@ -268,7 +268,7 @@ export class ChaincodeCLI {
     public async upgradeChaincode(chaincode: string, language: string, channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string) {
         const homedir = require('os').homedir();
-        path = path ? join(homedir, path) : join(homedir, this.networkRootPath);
+        path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
 
         let existConfig = await ExistNetworkConfig(path);
 
