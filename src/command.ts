@@ -15,12 +15,12 @@ const tasks = {
         return await CLI.cleanNetwork();
     },
     async installChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string) {
-        return await CLI.installChaincode(chaincode, language, channel, version, params, path, ccPath);
+        version?: string, params?: string, path?: string, ccPath?: string, inside?: boolean) {
+        return await CLI.installChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
     },
     async upgradeChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string) {
-        return await CLI.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath);
+        version?: string, params?: string, path?: string, ccPath?: string, inside?: boolean) {
+        return await CLI.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
     },
     async invokeChaincode(chaincode: string, fn: string) {
         return await CLI.invokeChaincode(chaincode, fn);
@@ -61,6 +61,7 @@ program
     .option('-c, --ctor <constructor>', 'Smart contract constructor params')
     .option('-p, --path <path>', 'Path to deploy the network folder')
     .option('-P, --chaincode-path <path>', 'Path to chaincode package. Default to ./<name>')
+    .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .action(async (name: string, language: string, cmd: any) => {
         await tasks.installChaincode(
             name,
@@ -69,7 +70,8 @@ program
             '1.0',
             cmd.ctor,
             cmd.path,
-            cmd.chaincodePath);
+            cmd.chaincodePath,
+            !!cmd.inside);
     });
 
 //chaincode: string, language: string, channel?: string,
@@ -80,6 +82,7 @@ program
     .option('-c, --ctor <constructor>', 'Smart contract constructor params')
     .option('-p, --path <path>', 'Path to deploy the network folder')
     .option('-P, --chaincode-path <path>', 'Path to chaincode package. Default to ./<name>')
+    .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .action(async (name: string, language: string, ver: string, cmd: any) => {
         await tasks.upgradeChaincode(
             name,
@@ -88,7 +91,8 @@ program
             ver,
             cmd.ctor,
             cmd.path,
-            cmd.chaincodePath);
+            cmd.chaincodePath,
+            !!cmd.inside);
     });
 program
     .command('invoke <chaincode>')

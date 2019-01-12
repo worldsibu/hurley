@@ -36,9 +36,11 @@ Create a new blockchain network in your computer. The first time you execute it,
 ```bash
 # New project
 hurl new
-    [-o -organizations <amount-of-organizations>]
-    [-u -users <users-per-organization>]
-    [-c -channels <amount-of-channels>]
+    [-o --organizations <amount-of-organizations>]
+    [-u --users <users-per-organization>]
+    [-c --channels <amount-of-channels>]
+    [-p --path <path-to-install-the-network>]
+    [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
 ```
 
 ### hurl clean
@@ -57,9 +59,11 @@ Be sure to run `hurl install` inside the folder with the source code you want to
 
 ```bash
 hurl install <chaincode> <language> 
+    [-p --path <path-to-install-the-network>]
     [-C --channel <channel>] # Defaults to ch1
     [-c --ctor <constructor>] # The constructor for the install function. Defaults to ' {"Args":["init",""]}'
     [-P --chaincode-path <path>] # Path to chaincode package. Default to ./<chaincode>
+    [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
 ```
 
 Language options:
@@ -73,9 +77,11 @@ Be sure to run `hurl upgrade` inside the folder with the source code you want to
 
 ```bash
 hurl upgrade <chaincode> <language> <version>
+    [-p --path <path-to-install-the-network>]
     [-C --channel <channel>] # Defaults to ch1
     [-c --ctor <constructor>] # The constructor for the install function. Defaults to '{"Args":["init",""]}'
     [-P --chaincode-path <path>] # Path to chaincode package. Default to ./<chaincode>
+    [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
 ```
 
 Language options:

@@ -29,15 +29,15 @@ export class CLI {
     }
 
     static async installChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string) {
+        version?: string, params?: string, path?: string, ccPath?: string, inside?: boolean) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.installChaincode(chaincode, language, channel, version, params, path, ccPath);
+        await cli.installChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
         return cli;
     }
     static async upgradeChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string) {
+        version?: string, params?: string, path?: string, ccPath?: string, inside?: boolean) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath);
+        await cli.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
         return cli;
     }
     static async invokeChaincode(chaincode: string, fn: string) {
@@ -235,7 +235,7 @@ export class ChaincodeCLI {
         this.analytics = new Analytics();
     }
     public async installChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string) {
+        version?: string, params?: string, path?: string, ccPath?: string, insideDocker?: boolean) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
 
@@ -266,7 +266,7 @@ export class ChaincodeCLI {
         this.analytics.trackChaincodeInstall(`CHAINCODE=${chaincode}`);
     }
     public async upgradeChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string) {
+        version?: string, params?: string, path?: string, ccPath?: string, insideDocker?: boolean) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
 
