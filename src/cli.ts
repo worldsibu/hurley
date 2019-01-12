@@ -257,7 +257,8 @@ export class ChaincodeCLI {
             networkRootPath: path,
             organizations: orgs,
             params,
-            hyperledgerVersion: config.hyperledgerVersion
+            hyperledgerVersion: config.hyperledgerVersion,
+            insideDocker
         });
 
         await chaincodeGenerator.save();
@@ -288,7 +289,8 @@ export class ChaincodeCLI {
             networkRootPath: path,
             organizations: orgs,
             params,
-            hyperledgerVersion: config.hyperledgerVersion
+            hyperledgerVersion: config.hyperledgerVersion,
+            insideDocker
         });
 
         await chaincodeGenerator.save();
