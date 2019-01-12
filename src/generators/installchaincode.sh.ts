@@ -15,7 +15,6 @@ export class InstallChaincodeShOptions {
     insideDocker: boolean;
 }
 
-//${this.options.insideDocker ? `peer0.${cOrg}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7051' : `7${index}51`}
 export class InstallChaincodeShGenerator extends BaseGenerator {
     success = join(this.path, 'tasks/', 'installchaincode.sh.successful');
     contents = `
@@ -47,8 +46,8 @@ ${this.options.orgs.map((org, index) => `
 echo "Installing Chaincode at ${org}"
 
 export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/users/Admin@${org}.hurley.lab/msp
-export CORE_PEER_ID=${this.options.insideDocker ? `peer0.${org}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7051' : `7${index}51`}
-export CORE_PEER_ADDRESS=localhost:7${index}51
+export CORE_PEER_ID=${this.options.insideDocker ? `peer0.${org}.hurley.lab` : 'localhost'}
+export CORE_PEER_ADDRESS=${this.options.insideDocker ? `peer0.${org}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7051' : `7${index}51`}
 export CORE_PEER_LOCALMSPID=${org}MSP
 export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/msp/tlscacerts/tlsca.${org}.hurley.lab-cert.pem
 
@@ -74,18 +73,17 @@ sleep 10
 echo "Instantiating Chaincode at ${this.options.orgs[0]}"
 echo "It may take a few minutes depending on the chaincode dependencies"
 export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/users/Admin@${this.options.orgs[0]}.hurley.lab/msp
-export CORE_PEER_ID=${this.options.insideDocker ? `peer0.${this.options.orgs[0]}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7051' : `7051`}
-export CORE_PEER_ADDRESS=localhost:7051
+export CORE_PEER_ID=${this.options.insideDocker ? `peer0.${this.options.orgs[0]}.hurley.lab` : 'localhost'}
+export CORE_PEER_ADDRESS=${this.options.insideDocker ? `peer0.${this.options.orgs[0]}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7051' : `7051`}
 export CORE_PEER_LOCALMSPID=${this.options.orgs[0]}MSP
 export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/msp/tlscacerts/tlsca.${this.options.orgs[0]}.hurley.lab-cert.pem
-
 
 ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode instantiate \
     -C ${this.options.channel}\
     -n ${this.options.name}\
     -v ${this.options.version}\
     -c '${this.options.params}'\
-    -o localhost:7050\
+    -o ${this.options.insideDocker ? `orderer.hurley.lab` : 'localhost'}:7050\
     --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
 
     # -P "${this.getPolicy(this.options.orgs)}"\
