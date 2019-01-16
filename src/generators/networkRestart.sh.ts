@@ -43,19 +43,38 @@ docker-compose -f ${this.options.networkRootPath}/docker-compose.yaml up -d
 USERS=${this.options.users}
 
 function createchannel() {
-    ${this.options.channels.map(ch => `
-    echo "Creating ${ch} channel block in peer $1"
-    docker exec $1 peer channel create  -o orderer.hurley.lab:7050 -c ${ch} -f /etc/hyperledger/configtx/${ch}.tx
+    SERVER=$1
+    CH=$2
 
-    docker exec $1 mv ${ch}.block /shared/
-    `).join('')}
+    echo "Creating $CH channel block in peer $SERVER"
+    docker exec $SERVER peer channel create  -o orderer.hurley.lab:7050 -c $CH -f /etc/hyperledger/configtx/$CH.tx
+
+    docker exec $SERVER mv $CH.block /shared/
 }
 
 function joinchannel() {
-    ${this.options.channels.map(ch => `
-    echo "Joining ${ch} channel on peer ${ch}"
-    docker exec $1 peer channel join -b /shared/${ch}.block
-    `).join('')}
+    echo "Joining $2 channel on peer $1"
+    SERVER=$1
+    CH=$2
+    COUNTER=1
+    MAX_RETRY=5
+    DELAY="3"
+
+    set -x
+    docker exec $1 peer channel join -b /shared/$2.block >&log.txt
+    set +x
+    res=$?
+
+    cat log.txt
+    if [ $res -ne 0 -a $COUNTER -lt $MAX_RETRY ]; then
+        COUNTER=$(expr $COUNTER + 1)
+        echo "$SERVER failed to join the channel, Retry after $DELAY seconds"
+        sleep $DELAY
+        joinchannel $SERVER $CH
+    else
+        COUNTER=1
+    fi
+
 }
 
 function setanchor() {
@@ -80,15 +99,17 @@ function registeruser() {
         -p "${this.options.networkRootPath}/network-profiles/$2.network-profile${this.options.insideDocker ? '.inside-docker' : ''}.yaml"
 }
 
-createchannel peer0.${this.options.organizations[0]}.hurley.lab
+${this.options.channels.map(ch => `
+createchannel peer0.${this.options.organizations[0]}.hurley.lab ${ch}
 
 sleep 10
 
-${this.options.organizations.map(org => `joinchannel peer0.${org}.hurley.lab
+${this.options.organizations.map(org => `joinchannel peer0.${org}.hurley.lab ${ch}
 `).join('')}
-${this.options.organizations.map(org => `setanchor peer0.${org}.hurley.lab
+${this.options.organizations.map(org => `setanchor peer0.${org}.hurley.lab ${ch}
 `).join('')}
 
+`)}
 sleep 5
 
 ${this.options.organizations.map(org => `
