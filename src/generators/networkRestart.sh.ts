@@ -61,12 +61,10 @@ function joinchannel() {
     DELAY="3"
 
     set -x
-    docker exec $1 peer channel join -b /shared/$2.block >&log.txt
+    output=$(docker exec $1 peer channel join -b /shared/$2.block && echo "pass" || echo "fail")
     set +x
-    res=$?
 
-    cat log.txt
-    if [ $res -ne 0 -a $COUNTER -lt $MAX_RETRY ]; then
+    if [ "$output" == "fail" ]; then
         COUNTER=$(expr $COUNTER + 1)
         echo "$SERVER failed to join the channel, Retry after $DELAY seconds"
         sleep $DELAY
