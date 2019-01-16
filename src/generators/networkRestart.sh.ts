@@ -82,7 +82,7 @@ function registeruser() {
 
 createchannel peer0.${this.options.organizations[0]}.hurley.lab
 
-sleep 5
+sleep 10
 
 ${this.options.organizations.map(org => `joinchannel peer0.${org}.hurley.lab
 `).join('')}
