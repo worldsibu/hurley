@@ -13,6 +13,7 @@ import { NetworkProfileYamlGenerator } from './generators/networkprofile.yaml';
 import { DownloadFabricBinariesGenerator } from './generators/downloadFabricBinaries';
 import { ChaincodeGenerator } from './generators/chaincodeGenerator';
 import { SaveNetworkConfig, LoadNetworkConfig, ExistNetworkConfig } from './utils/storage';
+import { ChaincodeInteractor } from './generators/chaincodeinteractor';
 
 export class CLI {
     static async createNetwork(organizations?: string, users?: string, channels?: string,
@@ -40,9 +41,10 @@ export class CLI {
         await cli.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
         return cli;
     }
-    static async invokeChaincode(chaincode: string, fn: string) {
+    static async invokeChaincode(chaincode: string, channel?: string, params?: string,
+        path?: string, inside?: boolean) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.invokeChaincode(chaincode, fn);
+        await cli.invokeChaincode(chaincode, channel, params, path, inside);
         return cli;
     }
 }
@@ -298,9 +300,30 @@ export class ChaincodeCLI {
 
         this.analytics.trackChaincodeUpgrade(`CHAINCODE=${chaincode}`);
     }
-    public async invokeChaincode(chaincode: string, fn: string) {
-        // ClientHelper
-        
-        this.analytics.trackChaincodeInvoke(`CHAINCODE=${this.installChaincode} fn=${fn}`);
+
+    public async invokeChaincode(chaincode: string,
+        channel?: string, params?: string, path?: string,
+        insideDocker?: boolean) {
+        const homedir = require('os').homedir();
+        path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
+        let existConfig = await ExistNetworkConfig(path);
+
+        if (!existConfig) {
+            l('Network configuration does not exist. Be sure to first create a new network with `hurley new`');
+            return;
+        }
+        let config = await LoadNetworkConfig(path);
+
+        let chaincodeInteractor = new ChaincodeInteractor(chaincode, {
+            channel,
+            networkRootPath: path,
+            params,
+            hyperledgerVersion: config.hyperledgerVersion,
+            insideDocker
+        });
+
+        await chaincodeInteractor.invoke();
+
+        this.analytics.trackChaincodeInvoke(`CHAINCODE=${this.installChaincode} params=${params}`);
     }
 }

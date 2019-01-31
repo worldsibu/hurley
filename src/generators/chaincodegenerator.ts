@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { InstallChaincodeShGenerator } from './installchaincode.sh';
 import { UpgradeChaincodeShGenerator } from './upgradechaincode.sh';
 import { l } from '../utils/logs';
+import { InvokeChaincodeShGenerator } from './invokechaincode.sh';
 
 export class ChaincodeGenerator {
     installScript: InstallChaincodeShGenerator;

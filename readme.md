@@ -15,6 +15,20 @@ It is an open source project under an Apache 2.0 license to help you create Conv
 npm i -g @worldsibu/hurley
 ```
 
+### Upgrade
+
+```bash
+npm upgrade -g @worldsibu/hurley
+```
+
+### Get Version
+
+Get the version of your Hurley installation.
+
+```bash
+hurl --version
+```
+
 Hurley deploys Hyperledger Fabric 1.3.0 networks.
 
 ### Basic network management
@@ -89,6 +103,23 @@ Language options:
 * node
 * golang
 * If you are using <a href="https://github.com/worldsibu/convector" target="_blank">Convector Smart Contracts</a> be sure to package first the code through `npm run cc:package -- <your-chaincode> org1`
+
+### hurl invoke
+
+You don't to be in any specific folder path, you just need the name of the chaincode.
+
+```bash
+hurl invoke <chaincode>
+    [-p --path <path-where-you-installed-the-network>]
+    [-C --channel <channel>] # Defaults to ch1
+    [-c --ctor <constructor>] # The params to send to the chaincode. Defaults to '{"Args":["init",""]}'
+    [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
+```
+
+The main parameters here are `<chaincode>` and `--ctor`. `--ctor` will be a object that your chaincode is expecting, for example:
+
+* `hurl invoke example02 --ctor '{"Args":["invoke","walter","diego","99"]}'`
+* `hurl invoke example02 --ctor '{"Args":["query","walter"]}'`
 
 ## Integrate to your development flow
 

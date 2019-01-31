@@ -22,8 +22,8 @@ const tasks = {
         version?: string, params?: string, path?: string, ccPath?: string, inside?: boolean) {
         return await CLI.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
     },
-    async invokeChaincode(chaincode: string, fn: string) {
-        return await CLI.invokeChaincode(chaincode, fn);
+    async invokeChaincode(chaincode: string, channel?: string, params?: string, path?: string, inside?: boolean) {
+        return await CLI.invokeChaincode(chaincode, channel, params, path, inside);
     },
 };
 
@@ -96,16 +96,25 @@ program
     });
 program
     .command('invoke <chaincode>')
-    .option('-f, --fn <fn>', 'Default function')
+    .option('-C, --channel <channel>', 'Channel name')
+    .option('-p, --path <path>', 'Path to deploy the network folder')
+    .option('-c, --ctor <constructor>', 'Smart contract request params')
+    .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .action(async (chaincode: string, cmd: any) => {
         await tasks.invokeChaincode(
             chaincode,
-            cmd.fn);
+            cmd.channel,
+            cmd.ctor,
+            cmd.path,
+            !!cmd.inside);
     });
 
 updateNotifier({
     pkg,
     updateCheckInterval: 1000 * 60
 }).notify();
+
+program
+    .version(pkg.version);
 
 program.parse(process.argv);
