@@ -299,8 +299,8 @@ export class ChaincodeCLI {
         this.analytics.trackChaincodeUpgrade(`CHAINCODE=${chaincode}`);
     }
     public async invokeChaincode(chaincode: string, fn: string) {
-        // let model = new ModelModel(this.chaincode, this.name, true);
-        // await model.save();
+        // ClientHelper
+        
         this.analytics.trackChaincodeInvoke(`CHAINCODE=${this.installChaincode} fn=${fn}`);
     }
 }
