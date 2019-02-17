@@ -41,10 +41,10 @@ export class CLI {
         await cli.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
         return cli;
     }
-    static async invokeChaincode(chaincode: string, fn: string, channel?: string, params?: string[],
-        path?: string, user?: string, organization?: string, inside?: boolean) {
+    static async invokeChaincode(chaincode: string, fn: string, channel?: string,
+        path?: string, user?: string, organization?: string, inside?: boolean, ...args: any[]) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.invokeChaincode(chaincode, fn, channel, params, path, user, organization, inside);
+        await cli.invokeChaincode(chaincode, fn, channel, path, user, organization, inside, ...args);
         return cli;
     }
 }
@@ -303,9 +303,10 @@ export class ChaincodeCLI {
 
     public async invokeChaincode(chaincode: string,
         fn: string,
-        channel?: string, params?: string[], path?: string,
+        channel?: string, path?: string,
         user?: string, organization?: string,
-        insideDocker?: boolean) {
+        insideDocker?: boolean,
+        ...args: any[]) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
         let existConfig = await ExistNetworkConfig(path);
@@ -319,14 +320,13 @@ export class ChaincodeCLI {
         let chaincodeInteractor = new ChaincodeInteractor(chaincode, fn, {
             channel,
             networkRootPath: path,
-            params,
             hyperledgerVersion: config.hyperledgerVersion,
             insideDocker,
             user, organization
-        });
+        }, ...args);
 
         await chaincodeInteractor.invoke();
 
-        this.analytics.trackChaincodeInvoke(`CHAINCODE=${this.installChaincode} params=${params}`);
+        this.analytics.trackChaincodeInvoke(`CHAINCODE=${this.installChaincode} params=${args}`);
     }
 }

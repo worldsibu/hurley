@@ -1,6 +1,7 @@
 // tslint:disable:max-line-length
 import { ClientConfig, ClientHelper, TxResult } from '@worldsibu/convector-common-fabric-helper';
 import { join, resolve } from 'path';
+import { l } from '../utils/logs';
 
 export class InvokeChaincodeShOptions {
     networkRootPath: string;
@@ -57,17 +58,17 @@ export class InvokeChaincodeShGenerator {
             txTimeout: 30000
         });
 
-        console.log('Sending transaction...');
+        l('Sending transaction...');
         await helper.init();
         let res: TxResult;
         try {
-            res = await helper.invoke(this.options.function, this.options.name, this.options.user, this.options.params);
+            res = await helper.invoke(this.options.function, this.options.name, this.options.user, ...this.options.params);
 
-            console.log(`Transaction sent! ${res.code} ${res.info} ${res.status} ${res.txId}`);
-            console.log(`Result: ${JSON.stringify(res.result)}`);
+            l(`Transaction sent! ${res.code} ${res.info} ${res.status} ${res.txId}`);
+            l(`Result: ${JSON.stringify(res.result)}`);
         } catch (ex) {
-            console.log(`Transaction failed!`);
-            console.log(ex);
+            l(`Transaction failed!`);
+            l(ex);
         }
     }
 }

@@ -3,6 +3,7 @@ import * as program from 'commander';
 import { CLI } from './cli';
 import { resolve } from 'path';
 import * as updateNotifier from 'update-notifier';
+import { l } from './utils/logs';
 
 const pkg = require('../package.json');
 
@@ -22,9 +23,9 @@ const tasks = {
         version?: string, params?: string, path?: string, ccPath?: string, inside?: boolean) {
         return await CLI.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
     },
-    async invokeChaincode(chaincode: string, fn: string, channel?: string, args?: string[], path?: string,
-        user?: string, organization?: string, inside?: boolean) {
-        return await CLI.invokeChaincode(chaincode, fn, channel, args, path, user, organization, inside);
+    async invokeChaincode(chaincode: string, fn: string, channel?: string, path?: string,
+        user?: string, organization?: string, inside?: boolean, ...args: any[]) {
+        return await CLI.invokeChaincode(chaincode, fn, channel, path, user, organization, inside, ...args);
     },
 };
 
@@ -104,15 +105,16 @@ program
     .option('-o, --organization <organization>', 'Select an specific organization to execute command. Default \'org1\'')
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .action(async (chaincode: string, fn: string, args: string[], cmd: any) => {
+        args.forEach(arg => l(arg));
         await tasks.invokeChaincode(
             chaincode,
             fn,
             cmd.channel,
-            args,
             cmd.path,
             cmd.user || 'user1',
             cmd.organization || 'org1',
-            !!cmd.inside);
+            !!cmd.inside,
+            ...args);
     });
 
 updateNotifier({

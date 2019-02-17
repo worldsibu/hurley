@@ -3,6 +3,7 @@ import * as fs from 'fs-extra';
 import { exec } from 'shelljs';
 import memFs = require('mem-fs');
 import memFsEditor = require('mem-fs-editor');
+import { l } from './logs';
 
 export module SysWrapper {
   let d = console.log;
@@ -97,7 +98,7 @@ export module SysWrapper {
 
       if (exec(simpleFileContent,
         { silent: false, shell: '/bin/bash' }).code !== 0) {
-        console.log('Found error while running script!');
+        l('Found error while running script!');
         throw new Error('Errors found in script, stopping execution');
       }
     }
@@ -106,7 +107,7 @@ export module SysWrapper {
   export async function execContent(content: any): Promise<void> {
     if (exec(content,
       { silent: false, shell: '/bin/bash' }).code !== 0) {
-      console.log('Found error while running script!');
+      l('Found error while running script!');
       throw new Error('Errors found in script, stopping execution');
     }
   }
