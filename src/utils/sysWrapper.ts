@@ -95,18 +95,20 @@ export module SysWrapper {
     } else {
       let simpleFileContent = await getFile(filePath);
 
-      return exec(
-        simpleFileContent,
-        { silent: false, shell: '/bin/bash' }
-      );
+      if (exec(simpleFileContent,
+        { silent: false, shell: '/bin/bash' }).code !== 0) {
+        console.log('Found error while running script!');
+        throw new Error('Errors found in script, stopping execution');
+      }
     }
   }
 
   export async function execContent(content: any): Promise<void> {
-    return exec(
-      content,
-      { silent: false, shell: '/bin/bash' }
-    );
+    if (exec(content,
+      { silent: false, shell: '/bin/bash' }).code !== 0) {
+      console.log('Found error while running script!');
+      throw new Error('Errors found in script, stopping execution');
+    }
   }
 
   /** Get a file from a path.
