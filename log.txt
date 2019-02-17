@@ -1,2 +1,0 @@
-[34m2019-01-16 06:20:29.050 UTC [channelCmd] InitCmdFactory -> INFO 001[0m Endorser and orderer connections initialized
-[34m2019-01-16 06:20:29.153 UTC [channelCmd] executeJoin -> INFO 002[0m Successfully submitted proposal to join channel
