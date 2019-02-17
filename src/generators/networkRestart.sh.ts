@@ -19,7 +19,7 @@ export class NetworkRestartShGenerator extends BaseGenerator {
     success = join(this.path, 'cyptofilesgenerator.sh.successful');
     contents = `
 #!/bin/bash
-set -e
+set +e
 
 #clean
 
