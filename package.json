@@ -1,6 +1,6 @@
 {
   "name": "@worldsibu/hurley",
-  "version": "0.4.28",
+  "version": "0.5.0",
   "description": "The development environment toolset for blockchain projects",
   "main": "index.js",
   "files": [
@@ -32,7 +32,8 @@
     "hyperledger",
     "fabric",
     "environment",
-    "blockchain"
+    "blockchain",
+    "hyperledger fabric"
   ],
   "author": "WorldSibu",
   "license": "Apache-2.0",
@@ -41,6 +42,7 @@
   },
   "homepage": "https://github.com/worldsibu/hurley#readme",
   "dependencies": {
+    "@worldsibu/convector-common-fabric-helper": "^1.2.0",
     "@worldsibu/convector-tool-chaincode-manager": "^1.2.0",
     "@worldsibu/convector-tool-dev-env": "^1.2.0",
     "async": "^2.1.4",
