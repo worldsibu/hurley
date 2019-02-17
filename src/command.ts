@@ -22,8 +22,9 @@ const tasks = {
         version?: string, params?: string, path?: string, ccPath?: string, inside?: boolean) {
         return await CLI.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
     },
-    async invokeChaincode(chaincode: string, channel?: string, params?: string, path?: string, inside?: boolean) {
-        return await CLI.invokeChaincode(chaincode, channel, params, path, inside);
+    async invokeChaincode(chaincode: string, fn: string, channel?: string, args?: string[], path?: string,
+        user?: string, organization?: string, inside?: boolean) {
+        return await CLI.invokeChaincode(chaincode, fn, channel, args, path, user, organization, inside);
     },
 };
 
@@ -95,17 +96,22 @@ program
             !!cmd.inside);
     });
 program
-    .command('invoke <chaincode>')
+    .command('invoke <chaincode> <fn> [args...]')
     .option('-C, --channel <channel>', 'Channel name')
     .option('-p, --path <path>', 'Path to deploy the network folder')
-    .option('-c, --ctor <constructor>', 'Smart contract request params')
+    // .option('-c, --ctor <constructor>', 'Smart contract request params')
+    .option('-u, --user <user>', 'Select an specific user to execute command. Default \'user1\'')
+    .option('-o, --organization <organization>', 'Select an specific organization to execute command. Default \'org1\'')
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
-    .action(async (chaincode: string, cmd: any) => {
+    .action(async (chaincode: string, fn: string, args: string[], cmd: any) => {
         await tasks.invokeChaincode(
             chaincode,
+            fn,
             cmd.channel,
-            cmd.ctor,
+            args,
             cmd.path,
+            cmd.user || 'user1',
+            cmd.organization || 'org1',
             !!cmd.inside);
     });
 

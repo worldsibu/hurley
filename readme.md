@@ -109,17 +109,18 @@ Language options:
 You don't to be in any specific folder path, you just need the name of the chaincode.
 
 ```bash
-hurl invoke <chaincode>
+hurl invoke <chaincode> <fn>  [args...]
     [-p --path <path-where-you-installed-the-network>]
+    [-u, --user <user>] # Select an specific user to execute command. Default user1
+    [-o, --organization <organization>] # Select an specific user to execute command. Default user1
     [-C --channel <channel>] # Defaults to ch1
-    [-c --ctor <constructor>] # The params to send to the chaincode. Defaults to '{"Args":["init",""]}'
     [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
 ```
 
 The main parameters here are `<chaincode>` and `--ctor`. `--ctor` will be a object that your chaincode is expecting, for example:
 
-* `hurl invoke example02 --ctor '{"Args":["invoke","walter","diego","99"]}'`
-* `hurl invoke example02 --ctor '{"Args":["query","walter"]}'`
+* `hurl invoke example02 invoke "walter" "diego" "99"`
+* `hurl invoke example02 query "walter"`
 
 ## Integrate to your development flow
 
@@ -143,8 +144,11 @@ Have ideas? Post them in the [Issues section](https://github.com/worldsibu/hurle
 Some ideas for future releases:
 
 * Hyperledger version select.
-* Invoke functions.
 * Support Hyperledger Sawtooth.
+
+## Changelog
+
+[Go to changelog](https://github.com/worldsibu/hurley/blob/develop/changelog.md)
 
 ## Important ⚗️
 

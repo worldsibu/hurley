@@ -7,28 +7,28 @@ import { InvokeChaincodeShGenerator } from './invokechaincode.sh';
 export class ChaincodeInteractor {
     invokeScript: InvokeChaincodeShGenerator;
 
-    constructor(public name: string, private options: {
+    constructor(public name: string, private fn: string, private options: {
         channel?: string;
         networkRootPath: string;
-        params: string;
+        params: string[];
         hyperledgerVersion: string;
         insideDocker?: boolean;
+        user?: string;
+        organization?: string;
     }) {
-        this.invokeScript = new InvokeChaincodeShGenerator('invokescript.sh', options.networkRootPath, {
+        this.invokeScript = new InvokeChaincodeShGenerator(options.networkRootPath, {
             channel: this.options.channel || 'ch1',
             name,
+            function: fn,
             networkRootPath: options.networkRootPath,
-            params: options.params || '{"Args":["init",""]}',
+            params: options.params || [],
             hyperledgerVersion: options.hyperledgerVersion,
-            insideDocker: this.options.insideDocker
+            insideDocker: this.options.insideDocker,
+            user: this.options.user, organization: this.options.organization
         });
     }
 
-    async save() {
-        await this.invokeScript.save();
-    }
-    
-    async invoke(){
+    async invoke() {
         return this.invokeScript.run();
     }
 }

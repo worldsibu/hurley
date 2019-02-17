@@ -41,10 +41,10 @@ export class CLI {
         await cli.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
         return cli;
     }
-    static async invokeChaincode(chaincode: string, channel?: string, params?: string,
-        path?: string, inside?: boolean) {
+    static async invokeChaincode(chaincode: string, fn: string, channel?: string, params?: string[],
+        path?: string, user?: string, organization?: string, inside?: boolean) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.invokeChaincode(chaincode, channel, params, path, inside);
+        await cli.invokeChaincode(chaincode, fn, channel, params, path, user, organization, inside);
         return cli;
     }
 }
@@ -302,7 +302,9 @@ export class ChaincodeCLI {
     }
 
     public async invokeChaincode(chaincode: string,
-        channel?: string, params?: string, path?: string,
+        fn: string,
+        channel?: string, params?: string[], path?: string,
+        user?: string, organization?: string,
         insideDocker?: boolean) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
@@ -314,12 +316,13 @@ export class ChaincodeCLI {
         }
         let config = await LoadNetworkConfig(path);
 
-        let chaincodeInteractor = new ChaincodeInteractor(chaincode, {
+        let chaincodeInteractor = new ChaincodeInteractor(chaincode, fn, {
             channel,
             networkRootPath: path,
             params,
             hyperledgerVersion: config.hyperledgerVersion,
-            insideDocker
+            insideDocker,
+            user, organization
         });
 
         await chaincodeInteractor.invoke();
