@@ -112,15 +112,22 @@ You don't to be in any specific folder path, you just need the name of the chain
 hurl invoke <chaincode> <fn>  [args...]
     [-p --path <path-where-you-installed-the-network>]
     [-u, --user <user>] # Select an specific user to execute command. Default user1
-    [-o, --organization <organization>] # Select an specific user to execute command. Default user1
+    [-o, --organization <organization>] # Select a specific organisation to execute the command. Default org1
     [-C --channel <channel>] # Defaults to ch1
     [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
 ```
 
-The main parameters here are `<chaincode>` and `--ctor`. `--ctor` will be a object that your chaincode is expecting, for example:
+The main parameters here are <chaincode>, <fn>, and [args...] where [args...] is an array of params separated by a blank space, for example:
 
+For Non-Convector-JS based chaincode methods
 * `hurl invoke example02 invoke "walter" "diego" "99"`
 * `hurl invoke example02 query "walter"`
+
+For Convector-JS based chaincode methods
+* `hurl invoke exampleconv exampleconv_beautifulMethod "walter" "diego" "99"`
+* `hurl invoke exampleconv exampleconv_beautifulQuery "walter"`
+
+Note the prepending of the chaincode (controller) name in the fn
 
 ## Integrate to your development flow
 
