@@ -13,6 +13,7 @@ Organizations:
     ID: OrdererMSP
     MSPDir: ./artifacts/crypto-config/ordererOrganizations/hurley.lab/msp
 
+
 ${this.options.orgs.map(x =>` 
   - &${x}
     Name: ${x}MSP
@@ -22,6 +23,23 @@ ${this.options.orgs.map(x =>`
       - Host: peer0.${x}.hurley.lab
         Port: 7051
 `).join('')}
+
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V1_3: true
+  Orderer: &OrdererCapabilities
+    V1_1: true
+  Application: &ApplicationCapabilities
+    V1_3: true
+    V1_2: false
+    V1_1: false
+
+Application: &ApplicationDefaults
+  Organizations:
+
+  Capabilities:
+    <<: *ApplicationCapabilities
 
 Orderer: &OrdererDefaults
   OrdererType: solo
@@ -38,8 +56,11 @@ Orderer: &OrdererDefaults
 
   Organizations:
 
-Application: &ApplicationDefaults
-  Organizations:
+
+Channel: &ChannelDefaults
+
+  Capabilities:
+      <<: *ChannelCapabilities
 
 Profiles:
   OrgsOrdererGenesis:
@@ -47,16 +68,19 @@ Profiles:
       <<: *OrdererDefaults
       Organizations:
         - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
     Consortiums:
       SampleConsortium:
         Organizations:
           ${this.options.orgs.map(x => `- *${x}
           `).join('')}
-
   OrgsChannel:
     Consortium: SampleConsortium
     Application:
       <<: *ApplicationDefaults
+      Capabilities:
+        <<: *ApplicationCapabilities
       Organizations:
         ${this.options.orgs.map(x => `- *${x}
         `).join('')}
