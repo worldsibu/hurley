@@ -29,7 +29,7 @@ Get the version of your Hurley installation.
 hurl --version
 ```
 
-Hurley deploys Hyperledger Fabric 1.3.0 networks.
+Hurley deploys Hyperledger Fabric 1.4.0 networks.
 
 ### Basic network management
 

@@ -86,8 +86,8 @@ export class NetworkCLI {
                 orgs,
                 networkRootPath: path,
                 envVars: {
-                    FABRIC_VERSION: '1.3.0',
-                    THIRDPARTY_VERSION: '0.4.13'
+                    FABRIC_VERSION: '1.4.0',
+                    THIRDPARTY_VERSION: '0.4.14'
                 }
             });
         let cryptoGenerator = new CryptoGeneratorShGenerator('generator.sh', path, {
@@ -95,7 +95,7 @@ export class NetworkCLI {
             networkRootPath: path,
             channels: chs,
             envVars: {
-                FABRIC_VERSION: '1.3.0'
+                FABRIC_VERSION: '1.4.0'
             }
         });
         let networkRestart = new NetworkRestartShGenerator('restart.sh', path, {
@@ -105,15 +105,15 @@ export class NetworkCLI {
             users,
             insideDocker,
             envVars: {
-                FABRIC_VERSION: '1.3.0',
-                THIRDPARTY_VERSION: '0.4.13'
+                FABRIC_VERSION: '1.4.0',
+                THIRDPARTY_VERSION: '0.4.14'
             }
         });
         let binariesDownload = new DownloadFabricBinariesGenerator('binaries.sh', path, {
             networkRootPath: path,
             envVars: {
-                FABRIC_VERSION: '1.3.0',
-                THIRDPARTY_VERSION: '0.4.13'
+                FABRIC_VERSION: '1.4.0',
+                THIRDPARTY_VERSION: '0.4.14'
             }
         });
 
@@ -195,8 +195,8 @@ export class NetworkCLI {
         l(`You can find the network topology (ports, names) here: ${join(path, 'docker-compose.yaml')}`);
         await SaveNetworkConfig(path, {
             organizations, users, channels, path,
-            hyperledgerVersion: '1.3.0',
-            externalHyperledgerVersion: '0.4.13'
+            hyperledgerVersion: '1.4.0',
+            externalHyperledgerVersion: '0.4.14'
         });
     }
 
