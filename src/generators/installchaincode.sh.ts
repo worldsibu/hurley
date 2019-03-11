@@ -85,7 +85,6 @@ export CORE_PEER_ADDRESS=${this.options.insideDocker ? `peer0.${this.options.org
 export CORE_PEER_LOCALMSPID=${this.options.orgs[0]}MSP
 export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/msp/tlscacerts/tlsca.${this.options.orgs[0]}.hurley.lab-cert.pem
 
-echo "COL=${this.options.colConfig}"
 ${this.options.colConfig ? ` echo "Instatiating with collection ${this.options.colConfig}"`: `` }
 
 ${this.options.language === 'golang' ? `
