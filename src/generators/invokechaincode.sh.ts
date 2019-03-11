@@ -8,6 +8,7 @@ export class InvokeChaincodeShOptions {
     channel: string;
     name: string;
     params: string[];
+    transientData?: string;
     function: string;
     hyperledgerVersion: string;
     insideDocker: boolean;
@@ -36,10 +37,22 @@ export class InvokeChaincodeShGenerator {
         await helper.init();
         let res: TxResult;
         try {
-            res = await helper.invoke(this.options.function, this.options.name, this.options.user, ...this.options.params);
+            await helper.useUser(this.options.user || 'user1' as string);
+
+            const { proposalResponse } = await helper.sendTransactionProposal({
+                fcn: this.options.function,
+                chaincodeId: this.options.name,
+                args: this.options.params,
+                transientMap: JSON.parse(this.options.transientData || '{}')
+            }, true);
+
+            res = await helper.processProposal(proposalResponse);
 
             l(`Transaction sent! ${res.code} ${res.info} ${res.status} ${res.txId}`);
             l(`Result: ${JSON.stringify(res.result)}`);
+
+            // res = await helper.invoke(this.options.function, this.options.name, this.options.user, ...this.options.params);
+
         } catch (ex) {
             l(`Transaction failed!`);
             l(ex);

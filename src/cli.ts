@@ -42,9 +42,9 @@ export class CLI {
         return cli;
     }
     static async invokeChaincode(chaincode: string, fn: string, channel?: string,
-        path?: string, user?: string, organization?: string, inside?: boolean, ...args: any[]) {
+        path?: string, user?: string, organization?: string, inside?: boolean, transientData?: string, ...args: any[]) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.invokeChaincode(chaincode, fn, channel, path, user, organization, inside, ...args);
+        await cli.invokeChaincode(chaincode, fn, channel, path, user, organization, inside, transientData, ...args);
         return cli;
     }
 }
@@ -237,7 +237,7 @@ export class ChaincodeCLI {
         this.analytics = new Analytics();
     }
     public async installChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string, colConfig?:string, insideDocker?: boolean) {
+        version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, insideDocker?: boolean) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
 
@@ -307,6 +307,7 @@ export class ChaincodeCLI {
         channel?: string, path?: string,
         user?: string, organization?: string,
         insideDocker?: boolean,
+        transientData?: string,
         ...args: any[]) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
@@ -321,6 +322,7 @@ export class ChaincodeCLI {
         let chaincodeInteractor = new ChaincodeInteractor(chaincode, fn, {
             channel,
             networkRootPath: path,
+            transientData: transientData,
             hyperledgerVersion: config.hyperledgerVersion,
             insideDocker,
             user, organization

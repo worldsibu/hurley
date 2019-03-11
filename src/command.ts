@@ -25,8 +25,9 @@ const tasks = {
         return await CLI.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
     },
     async invokeChaincode(chaincode: string, fn: string, channel?: string, path?: string,
-        user?: string, organization?: string, inside?: boolean, ...args: any[]) {
-        return await CLI.invokeChaincode(chaincode, fn, channel, path, user, organization, inside, ...args);
+        user?: string, organization?: string, inside?: boolean, transientData?: string, ...args: any[]) {
+        return await CLI.invokeChaincode(chaincode, fn, channel, path, user, organization,
+            inside, transientData, ...args);
     },
 };
 
@@ -103,6 +104,7 @@ program
     .command('invoke <chaincode> <fn> [args...]')
     .option('-C, --channel <channel>', 'Channel name')
     .option('-p, --path <path>', 'Path to deploy the network folder')
+    .option('-t, --transient-data <transient-data>', 'Private data, must be BASE64')
     // .option('-c, --ctor <constructor>', 'Smart contract request params')
     .option('-u, --user <user>', 'Select an specific user to execute command. Default \'user1\'')
     .option('-o, --organization <organization>', 'Select an specific organization to execute command. Default \'org1\'')
@@ -117,6 +119,7 @@ program
             cmd.user || 'user1',
             cmd.organization || 'org1',
             !!cmd.inside,
+            cmd.transientData || '',
             ...args);
     });
 

@@ -13,12 +13,14 @@ export class ChaincodeInteractor {
         hyperledgerVersion: string;
         insideDocker?: boolean;
         user?: string;
+        transientData?: string;
         organization?: string;
     }, ...args: any[]) {
         this.invokeScript = new InvokeChaincodeShGenerator(options.networkRootPath, {
             channel: this.options.channel || 'ch1',
             name,
             function: fn,
+            transientData: options.transientData,
             networkRootPath: options.networkRootPath,
             params: args || [],
             hyperledgerVersion: options.hyperledgerVersion,
