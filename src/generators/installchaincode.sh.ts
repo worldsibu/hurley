@@ -7,6 +7,7 @@ export class InstallChaincodeShOptions {
     orgs: string[];
     channel: string;
     name: string;
+    colConfig?: string;
     version: string;
     language: string;
     currentPath: string;
@@ -21,7 +22,7 @@ export class InstallChaincodeShGenerator extends BaseGenerator {
 #!/bin/bash
 set -e
 
-${this.options.language==='golang' ? `
+${this.options.language === 'golang' ? `
 
 if [ -z "$GOROOT" ]; then
     echo "Your $GOROOT variable is not set, make sure it points to the path where you installed Go."
@@ -38,12 +39,18 @@ mkdir -p ${this.options.networkRootPath}/src/go_temp_code
 
 cp -r ${this.options.currentPath}/ ${this.options.networkRootPath}/src/go_temp_code
 
+${this.options.colConfig ? `
+    mkdir -p ${this.options.networkRootPath}/src/go_temp_code/collections
+    echo "Looking for collection's config at ${this.options.colConfig}"
+    cp -r ${this.options.colConfig} ${this.options.networkRootPath}/src/go_temp_code/collections
+` : ``}
+
 `: ``}
 
 export FABRIC_CFG_PATH=${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/config
 
 ${this.options.orgs.map((org, index) => `
-echo "Installing Chaincode at ${org}"
+echo "Installing Chaincode ${this.options.name} version ${this.options.version} at ${org}"
 
 export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/users/Admin@${org}.hurley.lab/msp
 export CORE_PEER_ID=peer0.${org}.hurley.lab
@@ -51,13 +58,13 @@ export CORE_PEER_ADDRESS=${this.options.insideDocker ? `peer0.${org}.hurley.lab`
 export CORE_PEER_LOCALMSPID=${org}MSP
 export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/msp/tlscacerts/tlsca.${org}.hurley.lab-cert.pem
 
-${this.options.language==='golang' ? `
+${this.options.language === 'golang' ? `
 ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode install\
     -n ${this.options.name}\
     -v ${this.options.version}\
     -p "go_temp_code"\
     -l "${this.options.language}"
-`:`
+`: `
 ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode install\
     -n ${this.options.name}\
     -v ${this.options.version}\
@@ -65,7 +72,7 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
     -l "${this.options.language}"
 `}
 
-echo "Installed Chaincode at ${org}"
+echo "Installed Chaincode ${this.options.name} version ${this.options.version} at ${org}"
 `).join('')}
 
 sleep 10
@@ -78,15 +85,28 @@ export CORE_PEER_ADDRESS=${this.options.insideDocker ? `peer0.${this.options.org
 export CORE_PEER_LOCALMSPID=${this.options.orgs[0]}MSP
 export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/msp/tlscacerts/tlsca.${this.options.orgs[0]}.hurley.lab-cert.pem
 
+echo "COL=${this.options.colConfig}"
+${this.options.colConfig ? ` echo "Instatiating with collection ${this.options.colConfig}"`: `` }
+
+${this.options.language === 'golang' ? `
 ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode instantiate \
     -C ${this.options.channel}\
     -n ${this.options.name}\
     -v ${this.options.version}\
     -c '${this.options.params}'\
     -o ${this.options.insideDocker ? `orderer.hurley.lab` : 'localhost'}:7050\
-    --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
-
-    # -P "${this.getPolicy(this.options.orgs)}"\
+    --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem\
+    ${this.options.colConfig ? ` --collections-config "$GOPATH/src/go_temp_code/collections/${this.options.colConfig.split('/')[this.options.colConfig.split('/').length - 1]}"` : ``}
+    `: `
+${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode instantiate \
+    -C ${this.options.channel}\
+    -n ${this.options.name}\
+    -v ${this.options.version}\
+    -c '${this.options.params}'\
+    -o ${this.options.insideDocker ? `orderer.hurley.lab` : 'localhost'}:7050\
+    --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem\
+    ${this.options.colConfig ? ` --collections-config "${this.options.colConfig}"` : ``}
+    `}
 
 echo "Instantiated Chaincode at ${this.options.orgs[0]}"
 

@@ -15,6 +15,7 @@ export class ChaincodeGenerator {
         networkRootPath: string;
         language: string;
         params: string;
+        colConfig?: string;
         version?: string;
         hyperledgerVersion: string;
         path?: string;
@@ -25,6 +26,7 @@ export class ChaincodeGenerator {
             currentPath: this.currentPath,
             language: options.language,
             name,
+            colConfig: this.options.colConfig,
             networkRootPath: options.networkRootPath,
             orgs: options.organizations,
             params: options.params || '{"Args":["init",""]}',
