@@ -1,6 +1,6 @@
 // tslint:disable:max-line-length
 import { BaseGenerator } from './base';
-import { join } from 'path';
+import { join, resolve } from 'path';
 
 export class InstallChaincodeShOptions {
     networkRootPath: string;
@@ -41,8 +41,8 @@ cp -r ${this.options.currentPath}/ ${this.options.networkRootPath}/src/go_temp_c
 
 ${this.options.colConfig ? `
     mkdir -p ${this.options.networkRootPath}/src/go_temp_code/collections
-    echo "Looking for collection's config at ${this.options.colConfig}"
-    cp -r ${this.options.colConfig} ${this.options.networkRootPath}/src/go_temp_code/collections
+    echo "Looking for collection's config at ${resolve(process.cwd(), this.options.colConfig)}"
+    cp -r ${resolve(process.cwd(), this.options.colConfig)} ${this.options.networkRootPath}/src/go_temp_code/collections
 ` : ``}
 
 `: ``}
@@ -104,7 +104,7 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
     -c '${this.options.params}'\
     -o ${this.options.insideDocker ? `orderer.hurley.lab` : 'localhost'}:7050\
     --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem\
-    ${this.options.colConfig ? ` --collections-config "${this.options.colConfig}"` : ``}
+    ${this.options.colConfig ? ` --collections-config "${resolve(process.cwd(), this.options.colConfig)}"` : ``}
     `}
 
 echo "Instantiated Chaincode at ${this.options.orgs[0]}"
