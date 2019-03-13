@@ -31,6 +31,7 @@ export class CryptoConfigYamlGenerator extends BaseGenerator {
     # ---------------------------------------------------------------------------
     ${this.options.orgs.map(x=>`- Name: ${x}
       Domain: ${x}.hurley.lab
+      EnableNodeOUs: true
       # ---------------------------------------------------------------------------
       # "Specs"
       # ---------------------------------------------------------------------------

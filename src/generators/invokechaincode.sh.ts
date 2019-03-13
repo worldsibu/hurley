@@ -54,8 +54,27 @@ export class InvokeChaincodeShGenerator {
             // res = await helper.invoke(this.options.function, this.options.name, this.options.user, ...this.options.params);
 
         } catch (ex) {
-            l(`Transaction failed!`);
-            l(ex);
+            if (ex.responses) {
+                if (ex.responses.filter(response => !response.isProposalResponse).length === 0) {
+                    l(`No peer ran tx successfully!`);
+                    l(ex);
+                    return;
+                }
+                l(`At least one peer returned an error!`);
+                l(`This may happen when a transaction queries private data that's not accessible to all peers`);
+                ex.responses.map(response => {
+                    l(`Response from ${response.peer.name}`);
+                    if (response.isProposalResponse) {
+                        l(JSON.stringify(response));
+                    } else {
+                        // Good response
+                        l(response.response.payload.toString('utf8'));
+                    }
+                });
+            } else {
+                l(`Errors found!`);
+                l(ex);
+            }
         }
     }
 }

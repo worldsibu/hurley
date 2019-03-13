@@ -81,7 +81,9 @@ ${this.options.orgs.map((org, i) => `
             - CORE_VM_DOCKER_ATTACHSTDOUT=true
             - CORE_CHAINCODE_EXECUTETIMEOUT=60
             - CORE_LOGGING_PEER=debug
-            - CORE_LOGGING_LEVELdebug
+            - CORE_LOGGING_LEVEL=DEBUG
+            - FABRIC_LOGGING_SPEC=DEBUG
+            - CORE_LOGGING_GOSSIP=DEBUG
             - CORE_LOGGING_GRPC=DEBUG
             - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
             - CORE_PEER_LOCALMSPID=${org}MSP

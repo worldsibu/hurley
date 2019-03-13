@@ -93,6 +93,7 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
     -n ${this.options.name}\
     -v ${this.options.version}\
     -c '${this.options.params}'\
+    -P "${this.getPolicy(this.options.orgs)}"\
     -o ${this.options.insideDocker ? `orderer.hurley.lab` : 'localhost'}:7050\
     --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem\
     ${this.options.colConfig ? ` --collections-config "$GOPATH/src/go_temp_code/collections/${this.options.colConfig.split('/')[this.options.colConfig.split('/').length - 1]}"` : ``}
@@ -102,6 +103,7 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
     -n ${this.options.name}\
     -v ${this.options.version}\
     -c '${this.options.params}'\
+    -P "${this.getPolicy(this.options.orgs)}"\
     -o ${this.options.insideDocker ? `orderer.hurley.lab` : 'localhost'}:7050\
     --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem\
     ${this.options.colConfig ? ` --collections-config "${resolve(process.cwd(), this.options.colConfig)}"` : ``}
@@ -109,8 +111,8 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
 
 echo "Instantiated Chaincode at ${this.options.orgs[0]}"
 
-#mkdir -p ${this.options.networkRootPath}/tasks
-#touch ${this.success}
+mkdir -p ${this.options.networkRootPath}/tasks
+touch ${this.success}
   `;
 
     constructor(filename: string, path: string, private options: InstallChaincodeShOptions) {
@@ -120,7 +122,7 @@ echo "Instantiated Chaincode at ${this.options.orgs[0]}"
     getPolicy(orgs: string[]): string {
         return `OR(${
             orgs
-                .map(org => `'${org}.client'`)
+                .map(org => `'${org}MSP.member'`)
                 .join(',')
             })`;
     }
