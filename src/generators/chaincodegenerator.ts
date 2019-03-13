@@ -40,6 +40,7 @@ export class ChaincodeGenerator {
             language: options.language,
             name,
             networkRootPath: options.networkRootPath,
+            colConfig: this.options.colConfig,
             orgs: options.organizations,
             params: options.params || '{"Args":["init",""]}',
             version: options.version,

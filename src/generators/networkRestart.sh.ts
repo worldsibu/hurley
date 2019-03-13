@@ -92,7 +92,7 @@ function registeradmin() {
 function registeruser() {
     node ${devEnvPath}/command.js add-user $1 admin $4\
         -a "org1"\
-        -r client\
+        -r "client"\
         -k "${this.options.networkRootPath}/.hfc-$2"\
         -p "${this.options.networkRootPath}/network-profiles/$2.network-profile${this.options.insideDocker ? '.inside-docker' : ''}.yaml"
 }

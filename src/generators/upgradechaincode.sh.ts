@@ -1,6 +1,6 @@
 // tslint:disable:max-line-length
 import { BaseGenerator } from './base';
-import { join } from 'path';
+import { join, resolve } from 'path';
 
 export class UpgradeChaincodeShOptions {
     networkRootPath: string;
@@ -11,6 +11,7 @@ export class UpgradeChaincodeShOptions {
     language: string;
     currentPath: string;
     params: string;
+    colConfig?: string;
     hyperledgerVersion: string;
     insideDocker: boolean;
 }
@@ -35,12 +36,20 @@ rm -fr  ${this.options.networkRootPath}/src/go_temp_code
 mkdir -p ${this.options.networkRootPath}/src/go_temp_code
 
 cp -r ${this.options.currentPath}/ ${this.options.networkRootPath}/src/go_temp_code
+
+
+${this.options.colConfig ? `
+    mkdir -p ${this.options.networkRootPath}/src/go_temp_code/collections
+    echo "Looking for collection's config at ${resolve(process.cwd(), this.options.colConfig)}"
+    cp -r ${resolve(process.cwd(), this.options.colConfig)} ${this.options.networkRootPath}/src/go_temp_code/collections
+` : ``}
+
 `: ``}
 
 export FABRIC_CFG_PATH=${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/config
 
 ${this.options.orgs.map((org, index) => `
-echo "Installing Chaincode at ${org}"
+echo "Installing Chaincode ${this.options.name} version ${this.options.version} at ${org}"
 
 export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/users/Admin@${org}.hurley.lab/msp
 export CORE_PEER_ID=peer0.${org}.hurley.lab
@@ -54,12 +63,12 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
 ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode install -n ${this.options.name} -v ${this.options.version} -p "${this.options.currentPath}" -l "${this.options.language}"
 `}
 
-echo "Installed Chaincode at ${org}"
+echo "Installed Chaincode ${this.options.name} version ${this.options.version}  at ${org}"
 `).join('')}
 
 sleep 10
 
-echo "Upgrading Chaincode at ${this.options.orgs[0]}"
+echo "Upgrading Chaincode ${this.options.name} version ${this.options.version} at ${this.options.orgs[0]}"
 
 echo "It may take a few minutes depending on the chaincode dependencies"
 export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/users/Admin@${this.options.orgs[0]}.hurley.lab/msp
@@ -68,19 +77,35 @@ export CORE_PEER_ADDRESS=${this.options.insideDocker ? `peer0.${this.options.org
 export CORE_PEER_LOCALMSPID=${this.options.orgs[0]}MSP
 export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/msp/tlscacerts/tlsca.${this.options.orgs[0]}.hurley.lab-cert.pem
 
+${this.options.colConfig ? ` echo "Upgrading with collection ${this.options.colConfig}"`: `` }
+
+${this.options.language === 'golang' ? `
+
 ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode upgrade\
     -C ${this.options.channel}\
     -n ${this.options.name}\
     -v ${this.options.version}\
     -c '${this.options.params}'\
+    -P "${this.getPolicy(this.options.orgs)}"\
     -o ${this.options.insideDocker ? `orderer.hurley.lab` : 'localhost'}:7050\
-    --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem
-
-    # -P "${this.getPolicy(this.options.orgs)}"\
+    --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem\
+    ${this.options.colConfig ? ` --collections-config "$GOPATH/src/go_temp_code/collections/${this.options.colConfig.split('/')[this.options.colConfig.split('/').length - 1]}"` : ``}
+    `: `
+${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode upgrade\
+    -C ${this.options.channel}\
+    -n ${this.options.name}\
+    -v ${this.options.version}\
+    -c '${this.options.params}'\
+    -P "${this.getPolicy(this.options.orgs)}"\
+    -o ${this.options.insideDocker ? `orderer.hurley.lab` : 'localhost'}:7050\
+    --cafile ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/msp/tlscacerts/tlsca.hurley.lab-cert.pem\
+    ${this.options.colConfig ? ` --collections-config "${resolve(process.cwd(), this.options.colConfig)}"` : ``}
+    `}
 
 echo "Upgraded Chaincode at ${this.options.orgs[0]}"
 
-# touch ${this.success}
+mkdir -p ${this.options.networkRootPath}/tasks
+touch ${this.success}
   `;
 
     constructor(filename: string, path: string, private options: UpgradeChaincodeShOptions) {
@@ -90,7 +115,7 @@ echo "Upgraded Chaincode at ${this.options.orgs[0]}"
     getPolicy(orgs: string[]): string {
         return `OR(${
             orgs
-                .map(org => `'${org}.client'`)
+                .map(org => `'${org}MSP.member'`)
                 .join(',')
             })`;
     }

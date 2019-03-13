@@ -36,9 +36,9 @@ export class CLI {
         return cli;
     }
     static async upgradeChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string, inside?: boolean) {
+        version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, inside?: boolean) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, inside);
+        await cli.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, colConfig, inside);
         return cli;
     }
     static async invokeChaincode(chaincode: string, fn: string, channel?: string,
@@ -270,7 +270,7 @@ export class ChaincodeCLI {
         this.analytics.trackChaincodeInstall(`CHAINCODE=${chaincode}`);
     }
     public async upgradeChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string, insideDocker?: boolean) {
+        version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, insideDocker?: boolean) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
 
@@ -289,6 +289,7 @@ export class ChaincodeCLI {
             channel,
             language,
             version,
+            colConfig,
             networkRootPath: path,
             organizations: orgs,
             params,
