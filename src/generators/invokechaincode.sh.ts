@@ -30,7 +30,7 @@ export class InvokeChaincodeShGenerator {
             user: this.options.user,
             keyStore: resolve(this.path, `.hfc-${this.options.organization}`),
             networkProfile: resolve(this.path, `network-profiles/${this.options.organization}.network-profile.yaml`),
-            txTimeout: 30000
+            txTimeout: 300000
         });
 
         l('Sending transaction...');

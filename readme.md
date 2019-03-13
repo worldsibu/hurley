@@ -76,6 +76,7 @@ hurl install <chaincode> <language>
     [-p --path <path-to-install-the-network>]
     [-C --channel <channel>] # Defaults to ch1
     [-c --ctor <constructor>] # The constructor for the install function. Defaults to ' {"Args":["init",""]}'
+    [-x, --collections-config <collections-config>] # Collections config file path (private data
     [-P --chaincode-path <path>] # Path to chaincode package. Default to ./<chaincode>
     [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
 ```
@@ -93,7 +94,8 @@ Be sure to run `hurl upgrade` inside the folder with the source code you want to
 hurl upgrade <chaincode> <language> <version>
     [-p --path <path-to-install-the-network>]
     [-C --channel <channel>] # Defaults to ch1
-    [-c --ctor <constructor>] # The constructor for the install function. Defaults to '{"Args":["init",""]}'
+    [-c --ctor <**constructor**>] # The constructor for the install function. Defaults to '{"Args":["init",""]}'
+    [-x, --collections-config <collections-config>] # Collections config file path (private data
     [-P --chaincode-path <path>] # Path to chaincode package. Default to ./<chaincode>
     [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
 ```
@@ -111,6 +113,7 @@ You don't to be in any specific folder path, you just need the name of the chain
 ```bash
 hurl invoke <chaincode> <fn>  [args...]
     [-p --path <path-where-you-installed-the-network>]
+    [-t, --transient-data <transient-data>] # Private data, must be BASE64 https://hyperledger-fabric.readthedocs.io/en/release-1.4/private_data_tutorial.html#store-private-data
     [-u, --user <user>] # Select an specific user to execute command. Default user1
     [-o, --organization <organization>] # Select an specific user to execute command. Default user1
     [-C --channel <channel>] # Defaults to ch1
@@ -121,6 +124,12 @@ The main parameters here are `<chaincode>` and `--ctor`. `--ctor` will be a obje
 
 * `hurl invoke example02 invoke "walter" "diego" "99"`
 * `hurl invoke example02 query "walter"`
+
+## Private Data
+
+In recent versions of Hyperledger Fabric, it's now possible to handle [private collections of data](https://hyperledger-fabric.readthedocs.io/en/release-1.4/private_data_tutorial.html).
+
+Read [here more](https://github.com/worldsibu/hurley/blob/master/privatedata.md) how to configure smart contracts with private data, and how to make calls to it.
 
 ## Integrate to your development flow
 
@@ -148,7 +157,7 @@ Some ideas for future releases:
 
 ## Changelog
 
-[Go to changelog](https://github.com/worldsibu/hurley/blob/develop/changelog.md)
+[Go to changelog](https://github.com/worldsibu/hurley/blob/master/changelog.md)
 
 ## Important ⚗️
 
