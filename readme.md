@@ -79,6 +79,7 @@ hurl install <chaincode> <language>
     [-x, --collections-config <collections-config>] # Collections config file path (private data
     [-P --chaincode-path <path>] # Path to chaincode package. Default to ./<chaincode>
     [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
+    [-d --debug] # Runs the chaincode in debug mode, it doesn't start a container, instead it runs the process in your host machine. This is only available for Nodejs chaincodes for now, it will invoke `npm run start:debug`
 ```
 
 Language options:
