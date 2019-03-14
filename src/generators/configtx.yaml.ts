@@ -130,6 +130,7 @@ Profiles:
           `).join('')}
   OrgsChannel:
     Consortium: SampleConsortium
+    <<: *ChannelDefaults
     Application:
       <<: *ApplicationDefaults
       Capabilities:
