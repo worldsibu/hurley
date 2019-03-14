@@ -20,6 +20,7 @@ export class ChaincodeGenerator {
         hyperledgerVersion: string;
         path?: string;
         insideDocker?: boolean;
+        debug?: boolean;
     }) {
         this.installScript = new InstallChaincodeShGenerator('installscript.sh', options.networkRootPath, {
             channel: this.options.channel || 'ch1',
@@ -32,7 +33,8 @@ export class ChaincodeGenerator {
             params: options.params || '{"Args":["init",""]}',
             version: options.version || '1.0',
             hyperledgerVersion: options.hyperledgerVersion,
-            insideDocker: this.options.insideDocker
+            insideDocker: this.options.insideDocker,
+            debug: this.options.debug
         });
         this.upgradeScript = new UpgradeChaincodeShGenerator('upgradescript.sh', options.networkRootPath, {
             channel: this.options.channel || 'ch1',

@@ -16,9 +16,10 @@ const tasks = {
         return await CLI.cleanNetwork();
     },
     async installChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, inside?: boolean) {
+        version?: string, params?: string, path?: string, ccPath?: string,
+        colConfig?: string, inside?: boolean, debug?: boolean) {
         return await CLI.installChaincode(chaincode, language, channel, version,
-            params, path, ccPath, colConfig, inside);
+            params, path, ccPath, colConfig, inside, debug);
     },
     async upgradeChaincode(chaincode: string, language: string, channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string,  inside?: boolean) {
@@ -68,6 +69,7 @@ program
     .option('-p, --path <path>', 'Path to deploy the network folder')
     .option('-P, --chaincode-path <path>', 'Path to chaincode package. Default to ./<name>')
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
+    .option('-D, --debug', 'Run in debug mode, no container (NodeJS chaincodes only)')
     .action(async (name: string, language: string, cmd: any) => {
         await tasks.installChaincode(
             name,
@@ -78,7 +80,8 @@ program
             cmd.path,
             cmd.chaincodePath,
             cmd.collectionsConfig,
-            !!cmd.inside);
+            !!cmd.inside,
+            !!cmd.debug);
     });
 
 //chaincode: string, language: string, channel?: string,

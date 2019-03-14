@@ -97,7 +97,7 @@ ${this.options.orgs.map((org, i) => `
             - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
             - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=net_hurley_dev_net
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric
-        command: peer node start --peer-chaincodedev=false
+        command: peer node start --peer-chaincodedev=true
         ports:
             - 7${i}51:7051
             - 7${i}52:7052

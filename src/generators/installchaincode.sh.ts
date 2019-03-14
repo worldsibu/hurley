@@ -14,6 +14,7 @@ export class InstallChaincodeShOptions {
     params: string;
     hyperledgerVersion: string;
     insideDocker: boolean;
+    debug: boolean;
 }
 
 export class InstallChaincodeShGenerator extends BaseGenerator {
@@ -48,6 +49,14 @@ ${this.options.colConfig ? `
 `: ``}
 
 export FABRIC_CFG_PATH=${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/config
+
+${this.options.language === 'node' && this.options.debug ? `
+npm --prefix ${this.options.currentPath} install
+
+${this.options.orgs.map((org, index) => `
+CORE_CHAINCODE_ID_NAME=${this.options.name}:${this.options.version} DEBUG_PORT=999${index} npm --prefix ${this.options.currentPath} run start:debug -- --peer.address localhost:7${index}52 &
+`).join('')}
+` : ''}
 
 ${this.options.orgs.map((org, index) => `
 echo "Installing Chaincode ${this.options.name} version ${this.options.version} at ${org}"

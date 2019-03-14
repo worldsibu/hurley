@@ -30,9 +30,11 @@ export class CLI {
     }
 
     static async installChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, inside?: boolean) {
+        version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string,
+        inside?: boolean, debug?: boolean) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.installChaincode(chaincode, language, channel, version, params, path, ccPath, colConfig, inside);
+        await cli.installChaincode(chaincode, language, channel, version, params,
+            path, ccPath, colConfig, inside, debug);
         return cli;
     }
     static async upgradeChaincode(chaincode: string, language: string, channel?: string,
@@ -237,7 +239,8 @@ export class ChaincodeCLI {
         this.analytics = new Analytics();
     }
     public async installChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, insideDocker?: boolean) {
+        version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string,
+        insideDocker?: boolean, debug?: boolean) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
 
@@ -261,7 +264,8 @@ export class ChaincodeCLI {
             params,
             hyperledgerVersion: config.hyperledgerVersion,
             colConfig,
-            insideDocker
+            insideDocker,
+            debug
         });
 
         await chaincodeGenerator.save();
