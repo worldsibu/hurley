@@ -20,7 +20,10 @@
     "build": "npm run clean && tsc",
     "prepare": "npm run build",
     "lint": "tslint --fix -c './tslint.json' -p -p './tsconfig.json'",
-    "test": "mocha -r ts-node/register tests/**/*.spec.ts --reporter spec"
+    "test": "mocha -r ts-node/register tests/**/*.spec.ts --reporter spec",
+    "prepublish:ci": "npm version --git-tag-version=false $(npm view @worldsibu/hurley version)-alpha.$(git rev-parse --short HEAD)",
+    "publish:ci": "npm publish --tag=canary",
+    "postpublish:ci": "git reset --hard"
   },
   "repository": {
     "type": "git",
