@@ -139,7 +139,7 @@ For Convector-JS based chaincode methods
 
 In recent versions of Hyperledger Fabric, it's now possible to handle [private collections of data](https://hyperledger-fabric.readthedocs.io/en/release-1.4/private_data_tutorial.html).
 
-Read [here more](https://github.com/worldsibu/hurley/blob/master/privatedata.md) how to configure smart contracts with private data, and how to make calls to it.
+Read [here more](https://github.com/worldsibu/hurley/blob/develop/privatedata.md) how to configure smart contracts with private data, and how to make calls to it.
 
 ## Integrate to your development flow
 
