@@ -167,7 +167,7 @@ Some ideas for future releases:
 
 ## Changelog
 
-[Go to changelog](https://github.com/worldsibu/hurley/blob/master/changelog.md)
+[Go to changelog](https://github.com/worldsibu/hurley/blob/develop/changelog.md)
 
 ## Important ⚗️
 
