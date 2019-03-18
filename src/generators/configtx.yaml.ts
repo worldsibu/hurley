@@ -12,16 +12,7 @@ Organizations:
     Name: OrdererOrg
     ID: OrdererMSP
     MSPDir: ./artifacts/crypto-config/ordererOrganizations/hurley.lab/msp
-    Policies:
-      Readers:
-        Type: Signature
-        Rule: "OR('OrdererMSP.member')"
-      Writers:
-        Type: Signature
-        Rule: "OR('OrdererMSP.member')"
-      Admins:
-        Type: Signature
-        Rule: "OR('OrdererMSP.admin')"
+   
 
 ${this.options.orgs.map(x =>` 
   - &${x}
@@ -31,16 +22,7 @@ ${this.options.orgs.map(x =>`
     AnchorPeers:
       - Host: peer0.${x}.hurley.lab
         Port: 7051
-    Policies:
-      Readers:
-        Type: Signature
-        Rule: "OR('${x}MSP.admin', '${x}MSP.peer', '${x}MSP.client')"
-      Writers:
-        Type: Signature
-        Rule: "OR('${x}MSP.admin', '${x}MSP.client')"
-      Admins:
-        Type: Signature
-        Rule: "OR('${x}MSP.admin')"
+
 `).join('')}
 
 
@@ -56,16 +38,7 @@ Capabilities:
 
 Application: &ApplicationDefaults
   Organizations:
-  Policies:
-    Readers:
-      Type: ImplicitMeta
-      Rule: "ANY Readers"
-    Writers:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
-    Admins:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
+
 
   Capabilities:
     <<: *ApplicationCapabilities
@@ -84,36 +57,12 @@ Orderer: &OrdererDefaults
     PreferredMaxBytes: 512 KB
 
   Organizations:
-  Policies:
-    Readers:
-      Type: ImplicitMeta
-      Rule: "ANY Readers"
-    Writers:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
-    Admins:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
-    BlockValidation:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
+ 
 
 Channel: &ChannelDefaults
   Capabilities:
       <<: *ChannelCapabilities
-  Policies:
-    # Who may invoke the 'Deliver' API
-    Readers:
-      Type: ImplicitMeta
-      Rule: "ANY Readers"
-    # Who may invoke the 'Broadcast' API
-    Writers:
-      Type: ImplicitMeta
-      Rule: "ANY Writers"
-    # By default, who may modify elements at this config level
-    Admins:
-      Type: ImplicitMeta
-      Rule: "MAJORITY Admins"
+
 
 Profiles:
   OrgsOrdererGenesis:
