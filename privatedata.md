@@ -106,4 +106,4 @@ Checkout the data yourself: http://localhost:5184/_utils/#database
 
 ## Example - Convector
 
-- Soon!
+Here's a fully working example: https://github.com/worldsibu/convector-test-private-data
