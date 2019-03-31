@@ -33,7 +33,7 @@ export class InvokeChaincodeShGenerator {
             txTimeout: 300000
         });
 
-        l('Sending transaction...');
+        l(`Sending transaction as ${this.options.user} in org ${this.options.organization}...`);
         await helper.init();
         let res: TxResult;
         try {
@@ -44,7 +44,7 @@ export class InvokeChaincodeShGenerator {
                 chaincodeId: this.options.name,
                 args: this.options.params,
                 transientMap: JSON.parse(this.options.transientData || '{}')
-            }, true);
+            }, false);
 
             res = await helper.processProposal(proposalResponse);
 
