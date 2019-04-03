@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.2 (04-03-2019)
+## 1.0.3 (04-03-2019)
 
 * Feat: Multiple channels supported for Install and Upgrade command
 

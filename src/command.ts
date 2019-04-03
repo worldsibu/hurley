@@ -71,7 +71,7 @@ program
 
 program
     .command('install <name> <language>')
-    .option('-C, --channels <channels>', 'Channel names', collect, [])
+    .option('-C, --channel <channel>', 'Channel name', collect, [])
     .option('-c, --ctor <constructor>', 'Smart contract constructor params')
     .option('-x, --collections-config <collections-config>', 'Collections config file path (private data)')
     .option('-p, --path <path>', 'Path to deploy the network folder')
@@ -79,9 +79,8 @@ program
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .option('-D, --debug', 'Run in debug mode, no container (NodeJS chaincodes only)')
     .action(async (name: string, language: string, cmd: any) => {
-        cmd.channels = cmd.channels || ['ch1'];
-        await Promise.all(cmd.channels.map(channel => {
-            console.log(channel);
+        cmd.channel = cmd.channel || ['ch1'];
+        await Promise.all(cmd.channel.map(channel => {
             return tasks.installChaincode(
                 name,
                 language,
@@ -100,15 +99,15 @@ program
 // version?: string, params?: string, path?: string 
 program
     .command('upgrade <name> <language> <ver>')
-    .option('-C, --channels <channels>', 'Channel names', collect, [])
+    .option('-C, --channel <channel>', 'Channel name', collect, [])
     .option('-c, --ctor <constructor>', 'Smart contract constructor params')
     .option('-x, --collections-config <collections-config>', 'Collections config file path (private data)')
     .option('-p, --path <path>', 'Path to deploy the network folder')
     .option('-P, --chaincode-path <path>', 'Path to chaincode package. Default to ./<name>')
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .action(async (name: string, language: string, ver: string, cmd: any) => {
-        cmd.channels = cmd.channels || ['ch1'];
-        await Promise.all(cmd.channels.map(channel => {
+        cmd.channel = cmd.channel || ['ch1'];
+        await Promise.all(cmd.channel.map(channel => {
             return tasks.upgradeChaincode(
                 name,
                 language,
