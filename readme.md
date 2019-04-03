@@ -1,6 +1,6 @@
 # Hurley
 
-Hurley is the **development environment toolset** for blockchain projects. It supports Hyperledger Fabric and is being ported to support other chain technologies.
+Hurley is the **development environment toolset** for Enterprise Blockchain projects. It supports Hyperledger Fabric and is being ported to support other chain technologies.
 
 It is an open source project under an Apache 2.0 license to help you create Convector projects easily.
 

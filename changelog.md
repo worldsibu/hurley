@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2 (04-03-2019)
+
+* Feat: Multiple channels supported for Install and Upgrade command
+
+## 1.0.1 (03-31-2019)
+
+* Fix: Prevent all transactions being executed as Admin.
+
 ## 1.0.0 (03-18-2019)
 
 * Private data support for Convector and non-Convector smart contracts ([details](https://github.com/worldsibu/hurley/blob/develop/privatedata.md))
