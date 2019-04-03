@@ -7,6 +7,11 @@ import { l } from './utils/logs';
 
 const pkg = require('../package.json');
 
+function collect(val, memo) {
+    memo.push(val);
+    return memo;
+}
+
 const tasks = {
     async createNetwork(organizations?: string, users?: string, channels?: string,
         path?: string, inside?: boolean) {
@@ -22,8 +27,8 @@ const tasks = {
             params, path, ccPath, colConfig, inside, debug);
     },
     async upgradeChaincode(chaincode: string, language: string, channel?: string,
-        version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string,  inside?: boolean) {
-        return await CLI.upgradeChaincode(chaincode, language, channel, 
+        version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, inside?: boolean) {
+        return await CLI.upgradeChaincode(chaincode, language, channel,
             version, params, path, ccPath, colConfig, inside);
     },
     async invokeChaincode(chaincode: string, fn: string, channel?: string, path?: string,
@@ -61,9 +66,12 @@ program
         );
     });
 
+
+
+
 program
     .command('install <name> <language>')
-    .option('-C, --channel <channel>', 'Channel name')
+    .option('-C, --channels <channels>', 'Channel names', collect, [])
     .option('-c, --ctor <constructor>', 'Smart contract constructor params')
     .option('-x, --collections-config <collections-config>', 'Collections config file path (private data)')
     .option('-p, --path <path>', 'Path to deploy the network folder')
@@ -71,40 +79,47 @@ program
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .option('-D, --debug', 'Run in debug mode, no container (NodeJS chaincodes only)')
     .action(async (name: string, language: string, cmd: any) => {
-        await tasks.installChaincode(
-            name,
-            language,
-            cmd.channel,
-            '1.0',
-            cmd.ctor,
-            cmd.path,
-            cmd.chaincodePath,
-            cmd.collectionsConfig,
-            !!cmd.inside,
-            !!cmd.debug);
+        cmd.channels = cmd.channels || ['ch1'];
+        await Promise.all(cmd.channels.map(channel => {
+            console.log(channel);
+            return tasks.installChaincode(
+                name,
+                language,
+                channel,
+                '1.0',
+                cmd.ctor,
+                cmd.path,
+                cmd.chaincodePath,
+                cmd.collectionsConfig,
+                !!cmd.inside,
+                !!cmd.debug);
+        }));
     });
 
 //chaincode: string, language: string, channel?: string,
 // version?: string, params?: string, path?: string 
 program
     .command('upgrade <name> <language> <ver>')
-    .option('-C, --channel <channel>', 'Channel name')
+    .option('-C, --channels <channels>', 'Channel names', collect, [])
     .option('-c, --ctor <constructor>', 'Smart contract constructor params')
     .option('-x, --collections-config <collections-config>', 'Collections config file path (private data)')
     .option('-p, --path <path>', 'Path to deploy the network folder')
     .option('-P, --chaincode-path <path>', 'Path to chaincode package. Default to ./<name>')
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .action(async (name: string, language: string, ver: string, cmd: any) => {
-        await tasks.upgradeChaincode(
-            name,
-            language,
-            cmd.channel,
-            ver,
-            cmd.ctor,
-            cmd.path,
-            cmd.chaincodePath,
-            cmd.collectionsConfig || '',
-            !!cmd.inside);
+        cmd.channels = cmd.channels || ['ch1'];
+        await Promise.all(cmd.channels.map(channel => {
+            return tasks.upgradeChaincode(
+                name,
+                language,
+                channel,
+                ver,
+                cmd.ctor,
+                cmd.path,
+                cmd.chaincodePath,
+                cmd.collectionsConfig || '',
+                !!cmd.inside);
+        }));
     });
 program
     .command('invoke <chaincode> <fn> [args...]')

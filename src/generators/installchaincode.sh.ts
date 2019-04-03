@@ -58,6 +58,7 @@ CORE_CHAINCODE_ID_NAME=${this.options.name}:${this.options.version} DEBUG_PORT=9
 `).join('')}
 ` : ''}
 
+set +e
 ${this.options.orgs.map((org, index) => `
 echo "Installing Chaincode ${this.options.name} version ${this.options.version} at ${org}"
 
@@ -83,10 +84,11 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
 
 echo "Installed Chaincode ${this.options.name} version ${this.options.version} at ${org}"
 `).join('')}
+set -e
 
 sleep 10
 
-echo "Instantiating Chaincode at ${this.options.orgs[0]}"
+echo "Instantiating Chaincode at ${this.options.orgs[0]} for channel ${this.options.channel}"
 echo "It may take a few minutes depending on the chaincode dependencies"
 export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/users/Admin@${this.options.orgs[0]}.hurley.lab/msp
 export CORE_PEER_ID=peer0.${this.options.orgs[0]}.hurley.lab

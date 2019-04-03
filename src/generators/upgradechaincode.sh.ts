@@ -48,6 +48,7 @@ ${this.options.colConfig ? `
 
 export FABRIC_CFG_PATH=${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/config
 
+set +e
 ${this.options.orgs.map((org, index) => `
 echo "Installing Chaincode ${this.options.name} version ${this.options.version} at ${org}"
 
@@ -65,10 +66,11 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
 
 echo "Installed Chaincode ${this.options.name} version ${this.options.version}  at ${org}"
 `).join('')}
+set -e
 
 sleep 10
 
-echo "Upgrading Chaincode ${this.options.name} version ${this.options.version} at ${this.options.orgs[0]}"
+echo "Upgrading Chaincode ${this.options.name} version ${this.options.version} at ${this.options.orgs[0]} for channel ${this.options.channel}"
 
 echo "It may take a few minutes depending on the chaincode dependencies"
 export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/users/Admin@${this.options.orgs[0]}.hurley.lab/msp
