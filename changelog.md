@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4 (05-03-2019)
+
+* Fix: Introduced bug on 1.0.3 for default channels
+
 ## 1.0.3 (04-03-2019)
 
 * Feat: Multiple channels supported for Install and Upgrade command

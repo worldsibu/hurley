@@ -66,9 +66,6 @@ program
         );
     });
 
-
-
-
 program
     .command('install <name> <language>')
     .option('-C, --channel <channel>', 'Channel name', collect, [])
@@ -79,7 +76,7 @@ program
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .option('-D, --debug', 'Run in debug mode, no container (NodeJS chaincodes only)')
     .action(async (name: string, language: string, cmd: any) => {
-        cmd.channel = cmd.channel || ['ch1'];
+        cmd.channel = (!cmd.channel || cmd.channel.length === 0) ? ['ch1'] : cmd.channel;
         await Promise.all(cmd.channel.map(channel => {
             return tasks.installChaincode(
                 name,
@@ -106,7 +103,7 @@ program
     .option('-P, --chaincode-path <path>', 'Path to chaincode package. Default to ./<name>')
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .action(async (name: string, language: string, ver: string, cmd: any) => {
-        cmd.channel = cmd.channel || ['ch1'];
+        cmd.channel = (!cmd.channel || cmd.channel.length === 0) ? ['ch1'] : cmd.channel;
         await Promise.all(cmd.channel.map(channel => {
             return tasks.upgradeChaincode(
                 name,
