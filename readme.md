@@ -34,7 +34,7 @@ Hurley deploys Hyperledger Fabric 1.4.0 networks.
 ### Basic network management
 
 ```bash
-# Start a new blockchain network with 2 organizations, 2 users per organization, and 1 channel, localted at ~/Home/hyperledger-fabric-network
+# Start a new blockchain network with 2 organizations, 2 users per organization, and 1 channel, located at ~/Home/hyperledger-fabric-network
 hurl new
 
 # Clean every blockchain network deployment component
