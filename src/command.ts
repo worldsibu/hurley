@@ -17,8 +17,8 @@ const tasks = {
         path?: string, inside?: boolean) {
         return await CLI.createNetwork(organizations, users, channels, path, inside);
     },
-    async cleanNetwork() {
-        return await CLI.cleanNetwork();
+    async cleanNetwork(noRmi: boolean) {
+        return await CLI.cleanNetwork(noRmi);
     },
     async installChaincode(chaincode: string, language: string, channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string,
@@ -61,9 +61,13 @@ program
     });
 program
     .command('clean')
-    .action(async () => {
-        await tasks.cleanNetwork(
-        );
+    .option('-n, --no-rmi', 'Do not remove docker images')
+    .action(async (cmd: any) => {
+        if (cmd) {
+            await tasks.cleanNetwork(cmd.noRmi || false);
+        } else {
+            await tasks.cleanNetwork(false);
+        }
     });
 
 program
