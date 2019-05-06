@@ -7,11 +7,11 @@ import { CryptoConfigYamlGenerator } from './generators/cryptoconfig.yaml';
 import { CryptoGeneratorShGenerator } from './generators/cryptofilesgenerator.sh';
 import { DockerComposeYamlGenerator } from './generators/dockercompose.yaml';
 import { NetworkRestartShGenerator } from './generators/networkRestart.sh';
-import { NetworkCleanShGenerator } from './generators/networkClean.sh';
+import { NetworkCleanShGenerator, NetworkCleanShOptions } from './generators/networkClean.sh';
 import { l } from './utils/logs';
 import { NetworkProfileYamlGenerator } from './generators/networkprofile.yaml';
 import { DownloadFabricBinariesGenerator } from './generators/downloadFabricBinaries';
-import { ChaincodeGenerator } from './generators/chaincodeGenerator';
+import { ChaincodeGenerator } from './generators/chaincodegenerator';
 import { SaveNetworkConfig, LoadNetworkConfig, ExistNetworkConfig } from './utils/storage';
 import { ChaincodeInteractor } from './generators/chaincodeinteractor';
 
@@ -23,9 +23,9 @@ export class CLI {
             Number.parseInt(channels), path, inside);
         return cli;
     }
-    static async cleanNetwork() {
+    static async cleanNetwork(noRmi: boolean) {
         const cli = new NetworkCLI();
-        await cli.clean();
+        await cli.clean(noRmi);
         return cli;
     }
 
@@ -202,8 +202,10 @@ export class NetworkCLI {
         });
     }
 
-    public async clean() {
-        let networkClean = new NetworkCleanShGenerator('clean.sh', 'na', null);
+    public async clean(noRmi: boolean) {
+        const options = new NetworkCleanShOptions()
+        options.removeImages = !noRmi
+        let networkClean = new NetworkCleanShGenerator('clean.sh', 'na', options);
         await networkClean.run();
         this.analytics.trackNetworkClean();
         l('************ Success!');
