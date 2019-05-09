@@ -63,7 +63,7 @@ Clear your environment from all the components.
 
 ```bash
 hurl clean
-    [-n --do-not-rmi] # Ask `hurl` to not delete the container images
+    [-R --no-rmi] # Ask `hurl` to not delete the container images
 ```
 
 ### hurl install

@@ -23,9 +23,9 @@ export class CLI {
             Number.parseInt(channels), path, inside);
         return cli;
     }
-    static async cleanNetwork(noRmi: boolean) {
+    static async cleanNetwork(rmi: boolean) {
         const cli = new NetworkCLI();
-        await cli.clean(noRmi);
+        await cli.clean(rmi);
         return cli;
     }
 
@@ -202,9 +202,9 @@ export class NetworkCLI {
         });
     }
 
-    public async clean(noRmi: boolean) {
+    public async clean(rmi: boolean) {
         const options = new NetworkCleanShOptions()
-        options.removeImages = !noRmi
+        options.removeImages = rmi
         let networkClean = new NetworkCleanShGenerator('clean.sh', 'na', options);
         await networkClean.run();
         this.analytics.trackNetworkClean();
