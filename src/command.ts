@@ -61,10 +61,10 @@ program
     });
 program
     .command('clean')
-    .option('-n, --no-rmi', 'Do not remove docker images')
+    .option('-n, --do-not-rmi', 'Do not remove docker images')
     .action(async (cmd: any) => {
         if (cmd) {
-            await tasks.cleanNetwork(cmd.noRmi || false);
+            await tasks.cleanNetwork(cmd.doNotRmi || false);
         } else {
             await tasks.cleanNetwork(false);
         }
