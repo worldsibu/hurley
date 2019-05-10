@@ -36,7 +36,12 @@
     "fabric",
     "environment",
     "blockchain",
-    "hyperledger fabric"
+    "hyperledger fabric",
+    "solutions",
+    "smart contract",
+    "run",
+    "convector",
+    "composer"
   ],
   "author": "WorldSibu",
   "license": "Apache-2.0",
