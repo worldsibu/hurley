@@ -24,7 +24,6 @@ export class DockerComposeYamlGenerator extends BaseGenerator {
 services:
     # Orderer
     orderer-hurley-lab:
-        container_name: orderer.hurley.lab
         image: hyperledger/fabric-orderer:${this.options.envVars.FABRIC_VERSION}
         environment:
             - ORDERER_GENERAL_LOGLEVEL=debug
@@ -44,7 +43,8 @@ ${this.options.orgs.map(org => `
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/peers/peer0.${org}.hurley.lab/:/etc/hyperledger/msp/peer${org}`).join('')}
         networks:
             hurley_dev_net:
-                alias: orderer.hurley.lab
+                aliases:
+                    - orderer.hurley.lab
 
 ${this.options.orgs.map((org, i) => `
     # ${org}
@@ -63,12 +63,13 @@ ${this.options.orgs.map((org, i) => `
         container_name: ca.${org}.hurley.lab
         networks:
             hurley_dev_net:
-                alias: ca.${org}.hurley.lab
+                aliases:
+                    - ca.${org}.hurley.lab
 
 
     # Peer
     peer0-${org}-hurley-lab:
-        container_name: peer0.${org}.hurley.lab
+        hostname: peer0.${org}.hurley.lab
         image: hyperledger/fabric-peer:${this.options.envVars.FABRIC_VERSION}
         environment:
             - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -114,12 +115,12 @@ ${this.options.orgs.map((org, i) => `
             - couchdb-peer0-${org}-hurley-lab
         networks:
             hurley_dev_net:
-                alias: peer0.${org}.hurley.lab
+                aliases:
+                    - peer0.${org}.hurley.lab
 
 
     # Couch
     couchdb-peer0-${org}-hurley-lab:
-        container_name: couchdb.peer0.${org}.hurley.lab
         image: hyperledger/fabric-couchdb:${this.options.envVars.THIRDPARTY_VERSION}
         environment:
             - COUCHDB_USER=
@@ -128,7 +129,8 @@ ${this.options.orgs.map((org, i) => `
             - 5${i}84:5984
         networks:
             hurley_dev_net:
-                alias: couchdb.peer0.${org}.hurley.lab
+                aliases:
+                    - couchdb.peer0.${org}.hurley.lab
 
 `).join('')}
       
@@ -137,8 +139,6 @@ networks:
 
 volumes:
   shared:
-
-  
   `;
     }
 
