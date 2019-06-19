@@ -19,8 +19,7 @@ export class DockerComposeYamlGenerator extends BaseGenerator {
     async build() {
         let certs = await Promise.all(this.options.orgs.map(org => this.discoverCert(org)));
         this.contents = `version: '3.7'
-
-
+        
 services:
     # Orderer
     orderer-hurley-lab:
@@ -56,7 +55,7 @@ ${this.options.orgs.map((org, i) => `
             - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.${org}.hurley.lab-cert.pem
             - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/${certs[i]}
         ports:
-            - "7${i}54:7054"
+            - 7${i}54:7054
         command: fabric-ca-server start -b admin:adminpw -d
         volumes:
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/ca/:/etc/hyperledger/fabric-ca-server-config
@@ -65,7 +64,6 @@ ${this.options.orgs.map((org, i) => `
             hurley_dev_net:
                 aliases:
                     - ca.${org}.hurley.lab
-
 
     # Peer
     peer0-${org}-hurley-lab:
@@ -117,7 +115,6 @@ ${this.options.orgs.map((org, i) => `
             hurley_dev_net:
                 aliases:
                     - peer0.${org}.hurley.lab
-
 
     # Couch
     couchdb-peer0-${org}-hurley-lab:
