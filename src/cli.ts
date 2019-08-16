@@ -1,7 +1,7 @@
 import { SysWrapper } from './utils/sysWrapper';
+import { homedir } from 'os';
 import { join, resolve } from 'path';
 import { Analytics } from './utils/analytics';
-import * as Insight from 'insight';
 import { ConfigTxYamlGenerator } from './generators/configtx.yaml';
 import { CryptoConfigYamlGenerator } from './generators/cryptoconfig.yaml';
 import { CryptoGeneratorShGenerator } from './generators/cryptofilesgenerator.sh';
@@ -17,10 +17,10 @@ import { ChaincodeInteractor } from './generators/chaincodeinteractor';
 
 export class CLI {
     static async createNetwork(organizations?: string, users?: string, channels?: string,
-        path?: string, inside?: boolean) {
+        path?: string, inside?: boolean, skipDownload?: boolean) {
         const cli = new NetworkCLI();
         await cli.init(Number.parseInt(organizations), Number.parseInt(users),
-            Number.parseInt(channels), path, inside);
+            Number.parseInt(channels), path, inside, skipDownload);
         return cli;
     }
     static async cleanNetwork(rmi: boolean) {
@@ -58,9 +58,9 @@ export class NetworkCLI {
         this.analytics = new Analytics();
     }
 
-    public async init(organizations?: number, users?: number, channels?: number, path?: string, inside?: boolean) {
+    public async init(organizations?: number, users?: number, channels?: number, path?: string, inside?: boolean, skipDownload?: boolean) {
         this.analytics.init();
-        this.initNetwork(organizations, users, channels, path, inside);
+        this.initNetwork(organizations, users, channels, path, inside, skipDownload);
     }
 
     async initNetwork(
@@ -68,10 +68,10 @@ export class NetworkCLI {
         users?: number,
         channels?: number,
         path?: string,
-        insideDocker?: boolean
+        insideDocker?: boolean,
+        skipDownload = false
     ) {
-        const homedir = require('os').homedir();
-        path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
+        path = path ? resolve(homedir(), path) : join(homedir(), this.networkRootPath);
 
         let { orgs, chs, usrs } = buildNetworkConfig({ organizations, channels, users });
 
@@ -119,12 +119,14 @@ export class NetworkCLI {
             }
         });
 
-        l(`About to create binaries`);
-        await binariesDownload.save();
-        l(`Created and saved binaries`);
-        l(`About to run binaries`);
-        await binariesDownload.run();
-        l(`Ran binaries`);
+        if (!skipDownload) {
+            l(`About to create binaries`);
+            await binariesDownload.save();
+            l(`Created and saved binaries`);
+            l(`About to run binaries`);
+            await binariesDownload.run();
+            l(`Ran binaries`);
+        }
 
         l(`About to create configtxyaml`);
         await config.save();

@@ -14,8 +14,8 @@ function collect(val, memo) {
 
 const tasks = {
     async createNetwork(organizations?: string, users?: string, channels?: string,
-        path?: string, inside?: boolean) {
-        return await CLI.createNetwork(organizations, users, channels, path, inside);
+        path?: string, inside?: boolean, skipDownload?: boolean) {
+        return await CLI.createNetwork(organizations, users, channels, path, inside, skipDownload);
     },
     async cleanNetwork(rmi: boolean) {
         return await CLI.cleanNetwork(rmi);
@@ -46,6 +46,7 @@ program
     .option('-u, --users <users>', 'Users per organization')
     .option('-p, --path <path>', 'Path to deploy the network')
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
+    .option('--skip-download', 'Skip downloading the Fabric Binaries and Docker images')
     // .option('-p, --peers <peers>', 'Peers per organization')
     .action(async (cmd: any) => {
         if (cmd) {
@@ -53,7 +54,7 @@ program
                 !cmd.organizations || (cmd.organizations <= 2) ? 2 : cmd.organizations,
                 !cmd.users || (cmd.users <= 1) ? 1 : cmd.users,
                 !cmd.channels || (cmd.channels <= 1) ? 1 : cmd.channels,
-                cmd.path, !!cmd.inside
+                cmd.path, !!cmd.inside, !!cmd.skipDownload
             );
         } else {
             await tasks.createNetwork();
