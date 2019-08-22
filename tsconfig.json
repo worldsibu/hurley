@@ -8,6 +8,7 @@
         "sourceMap": true,
         "importHelpers": true,
         "experimentalDecorators": true,
+        "downlevelIteration": true,
         "removeComments": true,
         "lib": [
             "es2015"
