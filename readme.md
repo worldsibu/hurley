@@ -50,6 +50,7 @@ Create a new blockchain network in your computer. The first time you execute it,
 ```bash
 # New project
 hurl new
+    [-n --network <path>] # Path to the network definition file
     [-o --organizations <amount-of-organizations>]
     [-u --users <users-per-organization>]
     [-c --channels <amount-of-channels>]
@@ -73,7 +74,8 @@ Hurley handles the lifecycle of your chaincodes through `install` and `upgrade` 
 Be sure to run `hurl install` inside the folder with the source code you want to install.
 
 ```bash
-hurl install <chaincode> <language> 
+hurl install <chaincode> <language>
+    [-o --org <organization>]
     [-p --path <path-to-install-the-network>]
     [-C --channel <channel>] # Defaults to ch1. Use example: "-C ch1 -C ch2 -C ch3"
     [-c --ctor <constructor>] # The constructor for the install function. Defaults to ' {"Args":["init",""]}'
@@ -94,6 +96,7 @@ Be sure to run `hurl upgrade` inside the folder with the source code you want to
 
 ```bash
 hurl upgrade <chaincode> <language> <version>
+    [-o --org <organization>]
     [-p --path <path-to-install-the-network>]
     [-C --channel <channel>] # Defaults to ch1. Use example: "-C ch1 -C ch2 -C ch3"
     [-c --ctor <**constructor**>] # The constructor for the install function. Defaults to '{"Args":["init",""]}'
@@ -114,6 +117,7 @@ You don't to be in any specific folder path, you just need the name of the chain
 
 ```bash
 hurl invoke <chaincode> <fn>  [args...]
+    [-o --org <organization>]
     [-p --path <path-where-you-installed-the-network>]
     [-t, --transient-data <transient-data>] # Private data, must be BASE64 https://hyperledger-fabric.readthedocs.io/en/release-1.4/private_data_tutorial.html#store-private-data
     [-u, --user <user>] # Select an specific user to execute command. Default user1
@@ -135,6 +139,30 @@ For Convector-JS based chaincode methods
 * `hurl invoke exampleconv exampleconv_beautifulQuery "walter"`
 
 > Note the prepending of the chaincode (controller) name in the `<fn>` param.
+
+## Network Configuration File
+
+Hurley can setup a network based on a configuration file. This file must be set up as follow:
+
+```Json
+{
+  "channels": ["ch1", "ch2"],
+  "topology": {
+    "org1": {
+      "channels": ["ch1"],
+      "users": ["John", "Mike"]
+    },
+    "org2": {
+      "channels": ["ch2"],
+      "users": ["Jane"]
+    },
+    "org3": {
+      "channels": ["ch2", "ch1"],
+      "users": ["Henry"]
+    }
+  }
+}
+```
 
 ## Private Data
 
