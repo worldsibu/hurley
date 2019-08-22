@@ -1,14 +1,16 @@
 // tslint:disable:max-line-length
 import { BaseGenerator } from './base';
 import { join, dirname } from 'path';
+import { Organization } from '../models/organization';
+import { Channel } from '../models/channel';
 
 const devEnvPath = dirname(require.resolve('@worldsibu/convector-tool-dev-env'));
 
 export class NetworkRestartShOptions {
     networkRootPath: string;
     users: number;
-    channels: string[];
-    organizations: string[];
+    channels: Channel[];
+    organizations: Organization[];
     insideDocker: boolean;
     envVars: {
         FABRIC_VERSION: string,
@@ -76,11 +78,8 @@ function joinchannel() {
 }
 
 function setanchor() {
-    ${this.options.channels.map(ch => `
-    echo "Creating ${ch} anchor block in peer $1"
-    docker exec $1 peer channel update  -o orderer.hurley.lab:7050 -c ${ch} -f /etc/hyperledger/configtx/$1.${ch}.tx
-
-    `).join('')}
+    echo "Creating $2 anchor block in peer $1"
+    docker exec $1 peer channel update  -o orderer.hurley.lab:7050 -c $2 -f /etc/hyperledger/configtx/$1.$2.tx
 }
 
 function registeradmin() {
@@ -97,34 +96,34 @@ function registeruser() {
         -p "${this.options.networkRootPath}/network-profiles/$2.network-profile${this.options.insideDocker ? '.inside-docker' : ''}.yaml"
 }
 
-${this.options.channels.map(ch => `
-createchannel peer0.${this.options.organizations[0]}.hurley.lab ${ch}
+${this.options.channels.map(ch => {
+    const orgs = this.options.organizations.filter(org => !!org.channels.find(x => x.name === ch.name));
+    return `
+createchannel peer0.${orgs[0].name}.hurley.lab ${ch.name}
 
 sleep 10
 
-${this.options.organizations.map(org => `joinchannel peer0.${org}.hurley.lab ${ch}
+${orgs.map(org => `joinchannel peer0.${org.name}.hurley.lab ${ch.name}
 `).join('')}
-${this.options.organizations.map(org => `setanchor peer0.${org}.hurley.lab ${ch}
+${orgs.map(org => `setanchor peer0.${org.name}.hurley.lab ${ch.name}
 `).join('')}
 
-`)}
+`; 
+}).join('')}
 sleep 5
 
 ${this.options.organizations.map(org => `
-echo "Registering admin for ${org}"
-registeradmin ${org} ${org}MSP
+echo "Registering admin for ${org.name}"
+registeradmin ${org.name} ${org.name}MSP
 wait
 `).join('')}
 
 
-${Array.apply(null, { length: this.options.users }).map((user, index) => `
-
-${this.options.organizations.map(org => `
-echo "Registering user${index + 1} for ${org}"
-registeruser user${index + 1} ${org} department1 ${org}MSP 
+${this.options.organizations.map(org => org.users.map(user => `
+echo "Registering ${user.name} for ${org.name}"
+registeruser ${user.name} ${org.name} department1 ${org.name}MSP 
 wait
-`).join('')}
-`).join('')}
+`).join('')).join('')}
 
 `;
 

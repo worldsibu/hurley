@@ -1,6 +1,8 @@
 // tslint:disable:max-line-length
 import { BaseGenerator } from './base';
 import { join } from 'path';
+import { Organization } from '../models/organization';
+import { Channel } from '../models/channel';
 
 export class NetworkCleanShOptions {
     removeImages: boolean;

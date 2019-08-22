@@ -1,8 +1,10 @@
 import { BaseGenerator } from './base';
 import { join } from 'path';
+import { Organization } from '../models/organization';
+import { Channel } from '../models/channel';
 
 export class ConfigTxYamlGeneratorOptions {
-  orgs: string[];
+  orgs: Organization[];
   channels: number;
 }
 export class ConfigTxYamlGenerator extends BaseGenerator {
@@ -15,12 +17,12 @@ Organizations:
    
 
 ${this.options.orgs.map(x =>` 
-  - &${x}
-    Name: ${x}MSP
-    ID: ${x}MSP
-    MSPDir: ./artifacts/crypto-config/peerOrganizations/${x}.hurley.lab/msp
+  - &${x.name}
+    Name: ${x.name}MSP
+    ID: ${x.name}MSP
+    MSPDir: ./artifacts/crypto-config/peerOrganizations/${x.name}.hurley.lab/msp
     AnchorPeers:
-      - Host: peer0.${x}.hurley.lab
+      - Host: peer0.${x.name}.hurley.lab
         Port: 7051
 
 `).join('')}
@@ -75,7 +77,7 @@ Profiles:
     Consortiums:
       SampleConsortium:
         Organizations:
-          ${this.options.orgs.map(x => `- *${x}
+          ${this.options.orgs.map(x => `- *${x.name}
           `).join('')}
   OrgsChannel:
     Consortium: SampleConsortium
@@ -85,7 +87,7 @@ Profiles:
       Capabilities:
         <<: *ApplicationCapabilities
       Organizations:
-        ${this.options.orgs.map(x => `- *${x}
+        ${this.options.orgs.map(x => `- *${x.name}
         `).join('')}
     `;
 
