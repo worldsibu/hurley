@@ -89,8 +89,6 @@ export class NetworkCLI {
 
         await network.init();
 
-        //console.log(util.inspect(network, false, null, true /* enable colors */))
-
         let config = new ConfigTxYamlGenerator('configtx.yaml', path, {
             orgs: network.organizations,
             channels: 1
@@ -196,18 +194,21 @@ export class NetworkCLI {
         await networkRestart.run();
         l(`Ran network restart script`);
 
-        //this.analytics.trackNetworkNew(JSON.stringify({ organizations, users, channels, path }));
+        this.analytics.trackNetworkNew(JSON.stringify(network));
         l('************ Success!');
         l(`Complete network deployed at ${path}`);
-        //l(`Setup:
-        //- Organizations: ${organizations}${orgs.map(org => `
-        //    * ${org}`).join('')}
-        //- Users per organization: ${usrs} 
-        //    * admin ${usrs.map(usr => `
-        //    * ${usr}`).join('')}
-        //- Channels deployed: ${channels}${chs.map(ch => `
-        //    * ${ch}`).join('')}
-        //`);
+        l(`Setup:
+        - Channels deployed: ${network.channels.length}${network.channels.map(ch => `
+            * ${ch.name}`).join('')}
+        - Organizations: ${network.organizations.length}${network.organizations.map(org => `
+            * ${org.name}: 
+                - channels: ${org.channels.map(ch => `
+                    * ${ch.name}`)}
+                - users: 
+                    * admin ${org.users.map(usr => `
+                    * ${usr.name}`)}
+            `).join('')}
+        `);
         l(`You can find the network topology (ports, names) here: ${join(path, 'docker-compose.yaml')}`);
         await SaveNetworkConfig(path, network);
     }
@@ -217,7 +218,7 @@ export class NetworkCLI {
         options.removeImages = rmi
         let networkClean = new NetworkCleanShGenerator('clean.sh', 'na', options);
         await networkClean.run();
-        //this.analytics.trackNetworkClean();
+        this.analytics.trackNetworkClean();
         l('************ Success!');
         l('Environment cleaned!');
     }
@@ -249,8 +250,6 @@ export class ChaincodeCLI {
         }
 
         let organizations = network.organizations.filter(org => orgs.find(name => org.name === name));
-
-        console.log(network, orgs);
 
         let chaincodeGenerator = new ChaincodeGenerator(chaincode, {
             path: ccPath,
