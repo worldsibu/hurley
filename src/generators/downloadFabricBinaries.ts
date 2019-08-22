@@ -124,7 +124,7 @@ echo "Checking IMAGES"
 
 dockerFabricPull() {
     local FABRIC_TAG=$1
-    for IMAGES in peer orderer tools; do
+    for IMAGES in peer orderer ccenv tools; do
         echo "==> FABRIC IMAGE: $IMAGES"
         echo
         docker pull hyperledger/fabric-$IMAGES:$FABRIC_TAG
@@ -134,7 +134,7 @@ dockerFabricPull() {
   
   dockerThirdPartyImagesPull() {
     local THIRDPARTY_TAG=$1
-    for IMAGES in couchdb; do
+    for IMAGES in couchdb kafka zookeeper; do
         echo "==> THIRDPARTY DOCKER IMAGE: $IMAGES"
         echo
         docker pull hyperledger/fabric-$IMAGES:$THIRDPARTY_TAG

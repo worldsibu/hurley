@@ -3,6 +3,8 @@ import { InstallChaincodeShGenerator } from './installchaincode.sh';
 import { UpgradeChaincodeShGenerator } from './upgradechaincode.sh';
 import { l } from '../utils/logs';
 import { InvokeChaincodeShGenerator } from './invokechaincode.sh';
+import { Organization } from '../models/organization';
+import { Channel } from '../models/channel';
 
 export class ChaincodeGenerator {
     installScript: InstallChaincodeShGenerator;
@@ -10,8 +12,8 @@ export class ChaincodeGenerator {
     currentPath = this.options.path ? resolve(process.cwd(), this.options.path) : process.cwd();
 
     constructor(public name: string, private options: {
-        organizations: string[];
-        channel?: string;
+        organizations: Organization[];
+        channel?: Channel;
         networkRootPath: string;
         language: string;
         params: string;
@@ -23,7 +25,7 @@ export class ChaincodeGenerator {
         debug?: boolean;
     }) {
         this.installScript = new InstallChaincodeShGenerator('installscript.sh', options.networkRootPath, {
-            channel: this.options.channel || 'ch1',
+            channel: this.options.channel || new Channel('ch1'),
             currentPath: this.currentPath,
             language: options.language,
             name,
@@ -37,7 +39,7 @@ export class ChaincodeGenerator {
             debug: this.options.debug
         });
         this.upgradeScript = new UpgradeChaincodeShGenerator('upgradescript.sh', options.networkRootPath, {
-            channel: this.options.channel || 'ch1',
+            channel: this.options.channel || new Channel('ch1'),
             currentPath: this.currentPath,
             language: options.language,
             name,

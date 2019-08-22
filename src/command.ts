@@ -13,22 +13,22 @@ function collect(val, memo) {
 }
 
 const tasks = {
-    async createNetwork(organizations?: string, users?: string, channels?: string,
-        path?: string, inside?: boolean, skipDownload?: boolean) {
-        return await CLI.createNetwork(organizations, users, channels, path, inside, skipDownload);
+    async createNetwork(network?: any, organizations?: string, users?: string, channels?: string,
+        path?: string, inside?: boolean) {
+        return await CLI.createNetwork(network, organizations, users, channels, path, inside);
     },
     async cleanNetwork(rmi: boolean) {
         return await CLI.cleanNetwork(rmi);
     },
-    async installChaincode(chaincode: string, language: string, channel?: string,
+    async installChaincode(chaincode: string, language: string, orgs?: string[], channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string,
         colConfig?: string, inside?: boolean, debug?: boolean) {
-        return await CLI.installChaincode(chaincode, language, channel, version,
+        return await CLI.installChaincode(chaincode, language, orgs, channel, version,
             params, path, ccPath, colConfig, inside, debug);
     },
-    async upgradeChaincode(chaincode: string, language: string, channel?: string,
+    async upgradeChaincode(chaincode: string, language: string, orgs?: string[], channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, inside?: boolean) {
-        return await CLI.upgradeChaincode(chaincode, language, channel,
+        return await CLI.upgradeChaincode(chaincode, language, orgs, channel,
             version, params, path, ccPath, colConfig, inside);
     },
     async invokeChaincode(chaincode: string, fn: string, channel?: string, path?: string,
@@ -41,20 +41,21 @@ const tasks = {
 program
     .command('new')
     // .option('-v, --version <version>', 'Hyperledger Fabric version')
+    .option('-n, --network <path>', 'Path to the network definition file')
     .option('-c, --channels <channels>', 'Channels in the network')
     .option('-o, --organizations <organizations>', 'Amount of organizations')
     .option('-u, --users <users>', 'Users per organization')
     .option('-p, --path <path>', 'Path to deploy the network')
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
-    .option('--skip-download', 'Skip downloading the Fabric Binaries and Docker images')
     // .option('-p, --peers <peers>', 'Peers per organization')
     .action(async (cmd: any) => {
         if (cmd) {
             await tasks.createNetwork(
+                cmd.network,
                 !cmd.organizations || (cmd.organizations <= 2) ? 2 : cmd.organizations,
                 !cmd.users || (cmd.users <= 1) ? 1 : cmd.users,
                 !cmd.channels || (cmd.channels <= 1) ? 1 : cmd.channels,
-                cmd.path, !!cmd.inside, !!cmd.skipDownload
+                cmd.path, !!cmd.inside
             );
         } else {
             await tasks.createNetwork();
@@ -69,7 +70,8 @@ program
 
 program
     .command('install <name> <language>')
-    .option('-C, --channel <channel>', 'Channel name', collect, [])
+    .option('-o, --org <organization>', 'Target organization.', collect, [])
+    .option('-C, --channel <channel>', 'Channel to deploy the chaincode. Default to \'ch1\'', collect, [])
     .option('-c, --ctor <constructor>', 'Smart contract constructor params')
     .option('-x, --collections-config <collections-config>', 'Collections config file path (private data)')
     .option('-p, --path <path>', 'Path to deploy the network folder')
@@ -82,6 +84,7 @@ program
             return tasks.installChaincode(
                 name,
                 language,
+                cmd.org,
                 channel,
                 '1.0',
                 cmd.ctor,
@@ -97,6 +100,7 @@ program
 // version?: string, params?: string, path?: string 
 program
     .command('upgrade <name> <language> <ver>')
+    .option('-o, --org <organization>', 'Organisation name', collect, [])
     .option('-C, --channel <channel>', 'Channel name', collect, [])
     .option('-c, --ctor <constructor>', 'Smart contract constructor params')
     .option('-x, --collections-config <collections-config>', 'Collections config file path (private data)')
@@ -109,6 +113,7 @@ program
             return tasks.upgradeChaincode(
                 name,
                 language,
+                cmd.org,
                 channel,
                 ver,
                 cmd.ctor,
@@ -120,7 +125,7 @@ program
     });
 program
     .command('invoke <chaincode> <fn> [args...]')
-    .option('-C, --channel <channel>', 'Channel name')
+    .option('-C, --channel <channel>', 'Select a specific channel to execute the command. Default \'ch1\'')
     .option('-p, --path <path>', 'Path to deploy the network folder')
     .option('-t, --transient-data <transient-data>', 'Private data, must be BASE64')
     // .option('-c, --ctor <constructor>', 'Smart contract request params')

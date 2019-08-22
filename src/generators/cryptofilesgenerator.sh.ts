@@ -1,11 +1,13 @@
 // tslint:disable:max-line-length
 import { BaseGenerator } from './base';
 import { join } from 'path';
+import { Organization } from '../models/organization';
+import { Channel } from '../models/channel';
 
 export class CryptoGeneratorOptions {
   networkRootPath: string;
-  orgs: string[];
-  channels: string[];
+  orgs: Organization[];
+  channels: Channel[];
   envVars: {
     FABRIC_VERSION: string;
 };
@@ -44,19 +46,21 @@ export class CryptoGeneratorShGenerator extends BaseGenerator {
   $BIN/configtxgen -profile OrgsOrdererGenesis -outputBlock $TARGET/config/genesis.block
   fail "Failed to generate orderer genesis block..."
   
-  for CH in ${this.options.channels.map(x => `${x} `).join('')}
-  do
-    # generate channel configuration transaction
-    $BIN/configtxgen -profile OrgsChannel -outputCreateChannelTx $TARGET/config/$CH.tx -channelID $CH
-    fail "Failed to generate $CH configuration transaction..."
-  
-    ${this.options.orgs.map(x => `
-    $BIN/configtxgen -profile OrgsChannel -outputAnchorPeersUpdate $TARGET/config/peer0.${x}.hurley.lab.$CH.tx -channelID $CH -asOrg ${x}MSP
-    fail "Failed to generate $CH anchor peer update for ${x}..."
+  ${this.options.channels.map(ch => `
+  # =========== CHANNEL ${ch.name} ============
+
+  # generate channel configuration transaction
+  $BIN/configtxgen -profile OrgsChannel -outputCreateChannelTx $TARGET/config/${ch.name}.tx -channelID ${ch.name}
+  fail "Failed to generate ${ch.name} configuration transaction..."
+
+    ${this.options.orgs
+      .filter(org => !!org.channels.find((x => x.name === ch.name)))
+      .map(org => `
+  $BIN/configtxgen -profile OrgsChannel -outputAnchorPeersUpdate $TARGET/config/peer0.${org.name}.hurley.lab.${ch.name}.tx -channelID ${ch.name} -asOrg ${org.name}MSP
+  fail "Failed to generate ${ch.name} anchor peer update for ${org.name}..."
     
     `).join('')}
-
-  done
+  `).join('')}
   
   touch ${this.success}
   `;

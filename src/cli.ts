@@ -1,7 +1,7 @@
 import { SysWrapper } from './utils/sysWrapper';
-import { homedir } from 'os';
 import { join, resolve } from 'path';
 import { Analytics } from './utils/analytics';
+import * as Insight from 'insight';
 import { ConfigTxYamlGenerator } from './generators/configtx.yaml';
 import { CryptoConfigYamlGenerator } from './generators/cryptoconfig.yaml';
 import { CryptoGeneratorShGenerator } from './generators/cryptofilesgenerator.sh';
@@ -14,13 +14,18 @@ import { DownloadFabricBinariesGenerator } from './generators/downloadFabricBina
 import { ChaincodeGenerator } from './generators/chaincodegenerator';
 import { SaveNetworkConfig, LoadNetworkConfig, ExistNetworkConfig } from './utils/storage';
 import { ChaincodeInteractor } from './generators/chaincodeinteractor';
+import { Network } from './models/network';
+import { Channel } from './models/channel';
+import { Organization } from './models/organization';
+import { Peer } from './models/peer';
+import * as util from 'util';
 
 export class CLI {
-    static async createNetwork(organizations?: string, users?: string, channels?: string,
-        path?: string, inside?: boolean, skipDownload?: boolean) {
+    static async createNetwork(network?: any, organizations?: string, users?: string, channels?: string,
+        path?: string, inside?: boolean) {
         const cli = new NetworkCLI();
-        await cli.init(Number.parseInt(organizations), Number.parseInt(users),
-            Number.parseInt(channels), path, inside, skipDownload);
+        await cli.init(network, Number.parseInt(organizations), Number.parseInt(users),
+            Number.parseInt(channels), path, inside);
         return cli;
     }
     static async cleanNetwork(rmi: boolean) {
@@ -29,18 +34,18 @@ export class CLI {
         return cli;
     }
 
-    static async installChaincode(chaincode: string, language: string, channel?: string,
+    static async installChaincode(chaincode: string, language: string, orgs?: string[], channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string,
         inside?: boolean, debug?: boolean) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.installChaincode(chaincode, language, channel, version, params,
+        await cli.installChaincode(chaincode, language, orgs, channel, version, params,
             path, ccPath, colConfig, inside, debug);
         return cli;
     }
-    static async upgradeChaincode(chaincode: string, language: string, channel?: string,
+    static async upgradeChaincode(chaincode: string, language: string, orgs?: string[], channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, inside?: boolean) {
         const cli = new ChaincodeCLI(chaincode);
-        await cli.upgradeChaincode(chaincode, language, channel, version, params, path, ccPath, colConfig, inside);
+        await cli.upgradeChaincode(chaincode, language, orgs, channel, version, params, path, ccPath, colConfig, inside);
         return cli;
     }
     static async invokeChaincode(chaincode: string, fn: string, channel?: string,
@@ -58,34 +63,45 @@ export class NetworkCLI {
         this.analytics = new Analytics();
     }
 
-    public async init(organizations?: number, users?: number, channels?: number, path?: string, inside?: boolean, skipDownload?: boolean) {
+    public async init(network?: any, organizations?: number, users?: number, channels?: number, path?: string, inside?: boolean) {
         this.analytics.init();
-        this.initNetwork(organizations, users, channels, path, inside, skipDownload);
+        this.initNetwork(network, organizations, users, channels, path, inside);
     }
 
     async initNetwork(
+        networkConfigPath?: string,
         organizations?: number,
         users?: number,
         channels?: number,
         path?: string,
-        insideDocker?: boolean,
-        skipDownload = false
+        insideDocker?: boolean
     ) {
-        path = path ? resolve(homedir(), path) : join(homedir(), this.networkRootPath);
+        const homedir = require('os').homedir();
+        path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
 
-        let { orgs, chs, usrs } = buildNetworkConfig({ organizations, channels, users });
+        let network = new Network(path, {
+            networkConfigPath,
+            organizations,
+            users,
+            channels,
+            inside: insideDocker
+        });
+
+        await network.init();
+
+        //console.log(util.inspect(network, false, null, true /* enable colors */))
 
         let config = new ConfigTxYamlGenerator('configtx.yaml', path, {
-            orgs,
+            orgs: network.organizations,
             channels: 1
         });
         let cryptoConfig = new CryptoConfigYamlGenerator('crypto-config.yaml', path, {
-            orgs,
-            users
+            orgs: network.organizations,
+            users: 0
         });
         let dockerComposer = new DockerComposeYamlGenerator('docker-compose.yaml',
             path, {
-                orgs,
+                orgs: network.organizations,
                 networkRootPath: path,
                 envVars: {
                     FABRIC_VERSION: '1.4.0',
@@ -93,18 +109,18 @@ export class NetworkCLI {
                 }
             });
         let cryptoGenerator = new CryptoGeneratorShGenerator('generator.sh', path, {
-            orgs,
+            orgs: network.organizations,
             networkRootPath: path,
-            channels: chs,
+            channels: network.channels,
             envVars: {
                 FABRIC_VERSION: '1.4.0'
             }
         });
         let networkRestart = new NetworkRestartShGenerator('restart.sh', path, {
-            organizations: orgs,
+            organizations: network.organizations,
             networkRootPath: path,
-            channels: chs,
-            users,
+            channels: network.channels,
+            users: 0,
             insideDocker,
             envVars: {
                 FABRIC_VERSION: '1.4.0',
@@ -119,14 +135,12 @@ export class NetworkCLI {
             }
         });
 
-        if (!skipDownload) {
-            l(`About to create binaries`);
-            await binariesDownload.save();
-            l(`Created and saved binaries`);
-            l(`About to run binaries`);
-            await binariesDownload.run();
-            l(`Ran binaries`);
-        }
+        l(`About to create binaries`);
+        await binariesDownload.save();
+        l(`Created and saved binaries`);
+        l(`About to run binaries`);
+        await binariesDownload.run();
+        l(`Ran binaries`);
 
         l(`About to create configtxyaml`);
         await config.save();
@@ -152,25 +166,23 @@ export class NetworkCLI {
         l(`Saved compose`);
 
         l(`Creating network profiles`);
-        await Promise.all(orgs.map(async org => {
-            l(`Cleaning .hfc-${org}`);
-            await SysWrapper.removePath(join(path, `.hfc-${org}`));
-            l(`Creating for ${org}`);
-            await (new NetworkProfileYamlGenerator(`${org}.network-profile.yaml`,
+        await Promise.all(network.organizations.map(async org => {
+            l(`Cleaning .hfc-${org.name}`);
+            await SysWrapper.removePath(join(path, `.hfc-${org.name}`));
+            l(`Creating for ${org.name}`);
+            await (new NetworkProfileYamlGenerator(`${org.name}.network-profile.yaml`,
                 join(path, './network-profiles'), {
                     org,
-                    orgs,
+                    orgs: network.organizations,
                     networkRootPath: path,
-                    channels: chs,
                     insideDocker: false
                 })).save();
-            l(`Creating for ${org} inside Docker`);
-            await (new NetworkProfileYamlGenerator(`${org}.network-profile.inside-docker.yaml`,
+            l(`Creating for ${org.name} inside Docker`);
+            await (new NetworkProfileYamlGenerator(`${org.name}.network-profile.inside-docker.yaml`,
                 join(path, './network-profiles'), {
                     org,
-                    orgs,
+                    orgs: network.organizations,
                     networkRootPath: path,
-                    channels: chs,
                     insideDocker: true
                 })).save();
         }
@@ -184,24 +196,20 @@ export class NetworkCLI {
         await networkRestart.run();
         l(`Ran network restart script`);
 
-        this.analytics.trackNetworkNew(JSON.stringify({ organizations, users, channels, path }));
+        //this.analytics.trackNetworkNew(JSON.stringify({ organizations, users, channels, path }));
         l('************ Success!');
         l(`Complete network deployed at ${path}`);
-        l(`Setup:
-        - Organizations: ${organizations}${orgs.map(org => `
-            * ${org}`).join('')}
-        - Users per organization: ${usrs} 
-            * admin ${usrs.map(usr => `
-            * ${usr}`).join('')}
-        - Channels deployed: ${channels}${chs.map(ch => `
-            * ${ch}`).join('')}
-        `);
+        //l(`Setup:
+        //- Organizations: ${organizations}${orgs.map(org => `
+        //    * ${org}`).join('')}
+        //- Users per organization: ${usrs} 
+        //    * admin ${usrs.map(usr => `
+        //    * ${usr}`).join('')}
+        //- Channels deployed: ${channels}${chs.map(ch => `
+        //    * ${ch}`).join('')}
+        //`);
         l(`You can find the network topology (ports, names) here: ${join(path, 'docker-compose.yaml')}`);
-        await SaveNetworkConfig(path, {
-            organizations, users, channels, path,
-            hyperledgerVersion: '1.4.0',
-            externalHyperledgerVersion: '0.4.14'
-        });
+        await SaveNetworkConfig(path, network);
     }
 
     public async clean(rmi: boolean) {
@@ -209,32 +217,11 @@ export class NetworkCLI {
         options.removeImages = rmi
         let networkClean = new NetworkCleanShGenerator('clean.sh', 'na', options);
         await networkClean.run();
-        this.analytics.trackNetworkClean();
+        //this.analytics.trackNetworkClean();
         l('************ Success!');
         l('Environment cleaned!');
     }
 }
-
-let buildNetworkConfig = function (params: {
-    organizations: number;
-    channels: number;
-    users: number;
-}) {
-    let orgs = [];
-    for (let i = 0; i < params.organizations; i++) {
-        orgs.push(`org${i + 1}`);
-    }
-    let chs = [];
-    for (let i = 0; i < params.channels; i++) {
-        chs.push(`ch${i + 1}`);
-    }
-    let usrs = [];
-    params.users = params.users++;
-    for (let i = 0; i < params.users; i++) {
-        usrs.push(`user${i + 1}`);
-    }
-    return { orgs, chs, usrs };
-};
 
 export class ChaincodeCLI {
     networkRootPath = './hyperledger-fabric-network';
@@ -242,7 +229,7 @@ export class ChaincodeCLI {
     constructor(private name: string) {
         this.analytics = new Analytics();
     }
-    public async installChaincode(chaincode: string, language: string, channel?: string,
+    public async installChaincode(chaincode: string, language: string, orgs?: string[], channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string,
         insideDocker?: boolean, debug?: boolean) {
         const homedir = require('os').homedir();
@@ -254,30 +241,38 @@ export class ChaincodeCLI {
             l('Network configuration does not exist. Be sure to first create a new network with `hurley new`');
             return;
         }
-        let config = await LoadNetworkConfig(path);
 
-        let { orgs } = buildNetworkConfig(config);
+        const network = await LoadNetworkConfig(path);
+
+        if (orgs.length === 0) {
+            orgs.push('org1', 'org2');
+        }
+
+        let organizations = network.organizations.filter(org => orgs.find(name => org.name === name));
+
+        console.log(network, orgs);
 
         let chaincodeGenerator = new ChaincodeGenerator(chaincode, {
             path: ccPath,
-            channel,
+            channel: new Channel(channel),
             language,
             version,
             networkRootPath: path,
-            organizations: orgs,
+            organizations,
             params,
-            hyperledgerVersion: config.hyperledgerVersion,
+            hyperledgerVersion: network.options.hyperledgerVersion,
             colConfig,
             insideDocker,
             debug
         });
 
         await chaincodeGenerator.save();
+
         await chaincodeGenerator.install();
 
-        this.analytics.trackChaincodeInstall(`CHAINCODE=${chaincode}`);
+        //this.analytics.trackChaincodeInstall(`CHAINCODE=${chaincode}`);
     }
-    public async upgradeChaincode(chaincode: string, language: string, channel?: string,
+    public async upgradeChaincode(chaincode: string, language: string, orgs?: string[], channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, insideDocker?: boolean) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
@@ -288,20 +283,26 @@ export class ChaincodeCLI {
             l('Network configuration does not exist. Be sure to first create a new network with `hurley new`');
             return;
         }
-        let config = await LoadNetworkConfig(path);
 
-        let { orgs } = buildNetworkConfig(config);
+        const network = await LoadNetworkConfig(path);
+
+
+        if (orgs.length === 0) {
+            orgs.push('org1', 'org2');
+        }
+
+        let organizations = network.organizations.filter(o => orgs.find(a => o.name === a));
 
         let chaincodeGenerator = new ChaincodeGenerator(chaincode, {
             path: ccPath,
-            channel,
+            channel: new Channel(channel),
             language,
             version,
             colConfig,
             networkRootPath: path,
-            organizations: orgs,
+            organizations,
             params,
-            hyperledgerVersion: config.hyperledgerVersion,
+            hyperledgerVersion: network.options.hyperledgerVersion,
             insideDocker
         });
 
@@ -326,15 +327,25 @@ export class ChaincodeCLI {
             l('Network configuration does not exist. Be sure to first create a new network with `hurley new`');
             return;
         }
-        let config = await LoadNetworkConfig(path);
+        const network = await LoadNetworkConfig(path);
+
+        let org = network.organizations.find(o => o.name === organization);
+        if (!org) {
+            org = new Organization('org1', {
+                channels: [],
+                peers: [new Peer(`peer0`, { number: 0, ports: ['7051', '7052', '7053'], couchDbPort: '5084'})],
+                users: []
+            });
+        }
 
         let chaincodeInteractor = new ChaincodeInteractor(chaincode, fn, {
-            channel,
+            channel: new Channel(channel),
             networkRootPath: path,
             transientData: transientData,
-            hyperledgerVersion: config.hyperledgerVersion,
+            hyperledgerVersion: network.options.hyperledgerVersion,
             insideDocker,
-            user, organization
+            user,
+            organization: org 
         }, ...args);
 
         await chaincodeInteractor.invoke();

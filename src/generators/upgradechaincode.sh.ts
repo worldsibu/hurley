@@ -1,11 +1,13 @@
 // tslint:disable:max-line-length
 import { BaseGenerator } from './base';
 import { join, resolve } from 'path';
+import { Organization } from '../models/organization';
+import { Channel } from '../models/channel';
 
 export class UpgradeChaincodeShOptions {
     networkRootPath: string;
-    orgs: string[];
-    channel: string;
+    orgs: Organization[];
+    channel: Channel;
     name: string;
     version: string;
     language: string;
@@ -50,13 +52,13 @@ export FABRIC_CFG_PATH=${this.options.networkRootPath}/fabric-binaries/${this.op
 
 set +e
 ${this.options.orgs.map((org, index) => `
-echo "Installing Chaincode ${this.options.name} version ${this.options.version} at ${org}"
+echo "Installing Chaincode ${this.options.name} version ${this.options.version} at ${org.name}"
 
-export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/users/Admin@${org}.hurley.lab/msp
-export CORE_PEER_ID=peer0.${org}.hurley.lab
-export CORE_PEER_ADDRESS=${this.options.insideDocker ? `peer0.${org}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7051' : `7${index}51`}
-export CORE_PEER_LOCALMSPID=${org}MSP
-export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/msp/tlscacerts/tlsca.${org}.hurley.lab-cert.pem
+export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org.name}.hurley.lab/users/Admin@${org.name}.hurley.lab/msp
+export CORE_PEER_ID=peer0.${org.name}.hurley.lab
+export CORE_PEER_ADDRESS=${this.options.insideDocker ? `peer0.${org.name}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7051' : `${org.peers[0].options.ports[0]}`}
+export CORE_PEER_LOCALMSPID=${org.name}MSP
+export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org.name}.hurley.lab/msp/tlscacerts/tlsca.${org.name}.hurley.lab-cert.pem
 
 ${this.options.language==='golang' ? `
 ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode install -n ${this.options.name} -v ${this.options.version} -p "go_temp_code" -l "${this.options.language}"
@@ -64,27 +66,27 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
 ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode install -n ${this.options.name} -v ${this.options.version} -p "${this.options.currentPath}" -l "${this.options.language}"
 `}
 
-echo "Installed Chaincode ${this.options.name} version ${this.options.version}  at ${org}"
+echo "Installed Chaincode ${this.options.name} version ${this.options.version}  at ${org.name}"
 `).join('')}
 set -e
 
 sleep 10
 
-echo "Upgrading Chaincode ${this.options.name} version ${this.options.version} at ${this.options.orgs[0]} for channel ${this.options.channel}"
+echo "Upgrading Chaincode ${this.options.name} version ${this.options.version} at ${this.options.orgs[0].name} for channel ${this.options.channel.name}"
 
 echo "It may take a few minutes depending on the chaincode dependencies"
-export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/users/Admin@${this.options.orgs[0]}.hurley.lab/msp
-export CORE_PEER_ID=peer0.${this.options.orgs[0]}.hurley.lab
-export CORE_PEER_ADDRESS=${this.options.insideDocker ? `peer0.${this.options.orgs[0]}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7051' : `7051`}
-export CORE_PEER_LOCALMSPID=${this.options.orgs[0]}MSP
-export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0]}.hurley.lab/msp/tlscacerts/tlsca.${this.options.orgs[0]}.hurley.lab-cert.pem
+export CORE_PEER_MSPCONFIGPATH=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0].name}.hurley.lab/users/Admin@${this.options.orgs[0].name}.hurley.lab/msp
+export CORE_PEER_ID=peer0.${this.options.orgs[0].name}.hurley.lab
+export CORE_PEER_ADDRESS=${this.options.insideDocker ? `peer0.${this.options.orgs[0].name}.hurley.lab` : 'localhost'}:${this.options.insideDocker ? '7051' : `${this.options.orgs[0].peers[0].options.ports[0]}`}
+export CORE_PEER_LOCALMSPID=${this.options.orgs[0].name}MSP
+export CORE_PEER_TLS_ROOTCERT_FILE=${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${this.options.orgs[0].name}.hurley.lab/msp/tlscacerts/tlsca.${this.options.orgs[0].name}.hurley.lab-cert.pem
 
 ${this.options.colConfig ? ` echo "Upgrading with collection ${this.options.colConfig}"`: `` }
 
 ${this.options.language === 'golang' ? `
 
 ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode upgrade\
-    -C ${this.options.channel}\
+    -C ${this.options.channel.name}\
     -n ${this.options.name}\
     -v ${this.options.version}\
     -c '${this.options.params}'\
@@ -94,7 +96,7 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
     ${this.options.colConfig ? ` --collections-config "$GOPATH/src/go_temp_code/collections/${this.options.colConfig.split('/')[this.options.colConfig.split('/').length - 1]}"` : ``}
     `: `
 ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersion}/bin/peer chaincode upgrade\
-    -C ${this.options.channel}\
+    -C ${this.options.channel.name}\
     -n ${this.options.name}\
     -v ${this.options.version}\
     -c '${this.options.params}'\
@@ -104,7 +106,7 @@ ${this.options.networkRootPath}/fabric-binaries/${this.options.hyperledgerVersio
     ${this.options.colConfig ? ` --collections-config "${resolve(process.cwd(), this.options.colConfig)}"` : ``}
     `}
 
-echo "Upgraded Chaincode at ${this.options.orgs[0]}"
+echo "Upgraded Chaincode at ${this.options.orgs[0].name}"
 
 mkdir -p ${this.options.networkRootPath}/tasks
 touch ${this.success}
@@ -114,10 +116,10 @@ touch ${this.success}
         super(filename, path);
     }
 
-    getPolicy(orgs: string[]): string {
+    getPolicy(orgs: Organization[]): string {
         return `OR(${
             orgs
-                .map(org => `'${org}MSP.member'`)
+                .map(org => `'${org.name}MSP.member'`)
                 .join(',')
             })`;
     }

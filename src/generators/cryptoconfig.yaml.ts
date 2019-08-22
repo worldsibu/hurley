@@ -1,8 +1,10 @@
 import { BaseGenerator } from './base';
 import { join } from 'path';
+import { Organization } from '../models/organization';
+import { Channel } from '../models/channel';
 
 export class CryptoConfigOptions {
-    orgs: string[];
+    orgs: Organization[];
     users: number;
 }
 export class CryptoConfigYamlGenerator extends BaseGenerator {
@@ -29,8 +31,8 @@ export class CryptoConfigYamlGenerator extends BaseGenerator {
     # ---------------------------------------------------------------------------
     # Org1
     # ---------------------------------------------------------------------------
-    ${this.options.orgs.map(x=>`- Name: ${x}
-      Domain: ${x}.hurley.lab
+    ${this.options.orgs.map(x=>`- Name: ${x.name}
+      Domain: ${x.name}.hurley.lab
       EnableNodeOUs: true
       # ---------------------------------------------------------------------------
       # "Specs"
@@ -75,7 +77,7 @@ export class CryptoConfigYamlGenerator extends BaseGenerator {
       # Count: The number of user accounts _in addition_ to Admin
       # ---------------------------------------------------------------------------
       Users:
-        Count: ${this.options.users}
+        Count: ${x.users.length}
     `).join('')}
   `;
 
