@@ -72,14 +72,13 @@ export class InvokeChaincodeShGenerator {
                 l(`At least one peer returned an error!`);
                 l(`This may happen when a transaction queries private data that's not accessible to all peers`);
                 ex.responses.map(response => {
-                    console.log(response);
-                    //l(`Response from ${response.peer.name}`);
-                    //if (response.isProposalResponse) {
-                    //    l(JSON.stringify(response));
-                    //} else {
-                    //    // Good response
-                    //    l(response.response.payload.toString('utf8'));
-                    //}
+                    l(`Response from ${response.peer.name}`);
+                    if (response.isProposalResponse) {
+                        l(JSON.stringify(response));
+                    } else {
+                        // Good response
+                        l(response.response.payload.toString('utf8'));
+                    }
                 });
             } else {
                 l(`Errors found!`);
