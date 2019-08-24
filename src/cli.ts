@@ -22,10 +22,10 @@ import * as util from 'util';
 
 export class CLI {
     static async createNetwork(network?: any, organizations?: string, users?: string, channels?: string,
-        path?: string, inside?: boolean) {
+        path?: string, inside?: boolean, skipDownload?: boolean) {
         const cli = new NetworkCLI();
         await cli.init(network, Number.parseInt(organizations), Number.parseInt(users),
-            Number.parseInt(channels), path, inside);
+            Number.parseInt(channels), path, inside, skipDownload);
         return cli;
     }
     static async cleanNetwork(rmi: boolean) {
@@ -63,9 +63,9 @@ export class NetworkCLI {
         this.analytics = new Analytics();
     }
 
-    public async init(network?: any, organizations?: number, users?: number, channels?: number, path?: string, inside?: boolean) {
+    public async init(network?: any, organizations?: number, users?: number, channels?: number, path?: string, inside?: boolean, skipDownload?: boolean) {
         this.analytics.init();
-        this.initNetwork(network, organizations, users, channels, path, inside);
+        this.initNetwork(network, organizations, users, channels, path, inside, skipDownload);
     }
 
     async initNetwork(
@@ -74,7 +74,8 @@ export class NetworkCLI {
         users?: number,
         channels?: number,
         path?: string,
-        insideDocker?: boolean
+        insideDocker?: boolean,
+        skipDownload = false
     ) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
@@ -133,12 +134,14 @@ export class NetworkCLI {
             }
         });
 
-        l(`About to create binaries`);
-        await binariesDownload.save();
-        l(`Created and saved binaries`);
-        l(`About to run binaries`);
-        await binariesDownload.run();
-        l(`Ran binaries`);
+        if (!skipDownload) {
+            l(`About to create binaries`);
+            await binariesDownload.save();
+            l(`Created and saved binaries`);
+            l(`About to run binaries`);
+            await binariesDownload.run();
+            l(`Ran binaries`);
+        }
 
         l(`About to create configtxyaml`);
         await config.save();
