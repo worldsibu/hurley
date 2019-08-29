@@ -13,3 +13,6 @@ npm-debug.log*
 
 dist
 .convector-dev-env
+
+# Vim
+*.sw*

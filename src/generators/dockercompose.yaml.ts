@@ -18,15 +18,11 @@ export class DockerComposeYamlGenerator extends BaseGenerator {
     }
     async build() {
         let certs = await Promise.all(this.options.orgs.map(org => this.discoverCert(org)));
-        this.contents = `version: '2'
-
-networks:
-  hurley_dev_net:
-
+        this.contents = `version: '3.7'
+        
 services:
     # Orderer
-    orderer.hurley.lab:
-        container_name: orderer.hurley.lab
+    orderer-hurley-lab:
         image: hyperledger/fabric-orderer:${this.options.envVars.FABRIC_VERSION}
         environment:
             - ORDERER_GENERAL_LOGLEVEL=debug
@@ -45,11 +41,13 @@ services:
 ${this.options.orgs.map(org => `
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/peers/peer0.${org}.hurley.lab/:/etc/hyperledger/msp/peer${org}`).join('')}
         networks:
-            - hurley_dev_net
+            hurley_dev_net:
+                aliases:
+                    - orderer.hurley.lab
 
 ${this.options.orgs.map((org, i) => `
     # ${org}
-    ca.${org}.hurley.lab:
+    ca-${org}-hurley-lab:
         image: hyperledger/fabric-ca:${this.options.envVars.FABRIC_VERSION}
         environment:
             - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
@@ -57,19 +55,22 @@ ${this.options.orgs.map((org, i) => `
             - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.${org}.hurley.lab-cert.pem
             - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/${certs[i]}
         ports:
-            - "7${i}54:7054"
+            - 7${i}54:7054
         command: fabric-ca-server start -b admin:adminpw -d
         volumes:
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org}.hurley.lab/ca/:/etc/hyperledger/fabric-ca-server-config
         container_name: ca.${org}.hurley.lab
         networks:
-            - hurley_dev_net
+            hurley_dev_net:
+                aliases:
+                    - ca.${org}.hurley.lab
 
     # Peer
-    peer0.${org}.hurley.lab:
-        container_name: peer0.${org}.hurley.lab
+    peer0-${org}-hurley-lab:
+        hostname: peer0.${org}.hurley.lab
         image: hyperledger/fabric-peer:${this.options.envVars.FABRIC_VERSION}
         environment:
+            - GODEBUG=netdns=go
             - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
             - CORE_PEER_ID=peer0.${org}.hurley.lab
             - CORE_PEER_ADDRESS=peer0.${org}.hurley.lab:7051
@@ -109,14 +110,15 @@ ${this.options.orgs.map((org, i) => `
             - ${this.options.networkRootPath}/artifacts/config:/etc/hyperledger/configtx
             - shared:/shared
         depends_on:
-            - orderer.hurley.lab
-            - couchdb.peer0.${org}.hurley.lab
+            - orderer-hurley-lab
+            - couchdb-peer0-${org}-hurley-lab
         networks:
-            - hurley_dev_net
+            hurley_dev_net:
+                aliases:
+                    - peer0.${org}.hurley.lab
 
     # Couch
-    couchdb.peer0.${org}.hurley.lab:
-        container_name: couchdb.peer0.${org}.hurley.lab
+    couchdb-peer0-${org}-hurley-lab:
         image: hyperledger/fabric-couchdb:${this.options.envVars.THIRDPARTY_VERSION}
         environment:
             - COUCHDB_USER=
@@ -124,14 +126,17 @@ ${this.options.orgs.map((org, i) => `
         ports:
             - 5${i}84:5984
         networks:
-            - hurley_dev_net
+            hurley_dev_net:
+                aliases:
+                    - couchdb.peer0.${org}.hurley.lab
 
 `).join('')}
       
+networks:
+  hurley_dev_net:
+
 volumes:
   shared:
-
-  
   `;
     }
 
