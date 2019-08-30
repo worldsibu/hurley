@@ -59,7 +59,7 @@ export class InvokeChaincodeShGenerator {
 
             l(`Transaction sent! ${res.code} ${res.info} ${res.status} ${res.txId}`);
             l(`Result: ${JSON.stringify(res.result)}`);
-
+            helper.close();
             // res = await helper.invoke(this.options.function, this.options.name, this.options.user, ...this.options.params);
 
         } catch (ex) {

@@ -341,7 +341,7 @@ export class ChaincodeCLI {
         }
 
         let chaincodeInteractor = new ChaincodeInteractor(chaincode, fn, {
-            channel: new Channel(channel),
+            channel: channel ? new Channel(channel) : undefined,
             networkRootPath: path,
             transientData: transientData,
             hyperledgerVersion: network.options.hyperledgerVersion,

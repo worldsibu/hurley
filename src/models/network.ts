@@ -42,7 +42,7 @@ export class Network {
     this.channels = chs;
   }
 
-  buildFromSave(organizations: Organization[], channels: Channel[], users: User[]) {
+  buildFromSave(organizations: Organization[] = [], channels: Channel[] = [], users: User[]) {
     this.organizations = organizations;
     this.channels = channels;
   }
