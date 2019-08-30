@@ -272,7 +272,7 @@ export class ChaincodeCLI {
 
         await chaincodeGenerator.install();
 
-        //this.analytics.trackChaincodeInstall(`CHAINCODE=${chaincode}`);
+        this.analytics.trackChaincodeInstall(`CHAINCODE=${chaincode}`);
     }
     public async upgradeChaincode(chaincode: string, language: string, orgs?: string[], channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string, colConfig?: string, insideDocker?: boolean) {
