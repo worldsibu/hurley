@@ -21,7 +21,7 @@ client:
     credentialStore:
         path: ${this.options.insideDocker ? `/config/.hfc-${this.options.org.name}` : `${this.options.networkRootPath}/.hfc-${this.options.org.name}`} 
         cryptoStore:
-            path: ${this.options.insideDocker ? `/config/.hfc-${this.options.org}` : `${this.options.networkRootPath}/.hfc-${this.options.org.name}`} 
+            path: ${this.options.insideDocker ? `/config/.hfc-${this.options.org.name}` : `${this.options.networkRootPath}/.hfc-${this.options.org.name}`} 
 
 channels:${this.options.org.channels.map(channel => `
     ${channel.name}:
