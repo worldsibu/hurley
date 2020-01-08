@@ -131,6 +131,7 @@ ${org.peers.map(peer => `
         environment:
             - COUCHDB_USER=
             - COUCHDB_PASSWORD=
+        command: bash -c "chown couchdb -R /opt/couchdb/data; /docker-entrypoint.sh /opt/couchdb/bin/couchdb"
         ports:
             - ${peer.options.couchDbPort}:5984
         volumes:
