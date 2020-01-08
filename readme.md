@@ -46,6 +46,8 @@ hurl clean
 ### hurl new
 
 Create a new blockchain network in your computer. The first time you execute it, Hurley will check for Hyperledger Fabric's binaries and Container Images.
+It will store the container data holding up the blockchain information in a folder inside `<path>/data`. If this folder gets deleted, the blockchain information is gone.
+Hurley daletes this folder on every `hurl new`. If you don't want to delete it, run `hurl new --skip-cleanup`. It also gets deleted in the `hurl clean` command.
 
 ```bash
 # New project
@@ -56,6 +58,7 @@ hurl new
     [-c --channels <amount-of-channels>]
     [-p --path <path-to-install-the-network>]
     [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
+    [--skip-cleanup] Skips cleaning up the <path>/data folder
 ```
 
 ### hurl explorer
@@ -74,6 +77,7 @@ Clear your environment from all the components.
 
 ```bash
 hurl clean
+    [-p --path <path-to-install-the-network>]
     [-R --no-rmi] # Ask `hurl` to not delete the container images
 ```
 

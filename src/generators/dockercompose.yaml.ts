@@ -37,11 +37,13 @@ services:
             - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
             - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
             - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
+            - ORDERER_FILELEDGER_LOCATION=/data
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
         command: orderer
         ports:
             - 7050:7050
         volumes:
+            - ${this.options.networkRootPath}/data/orderer/:/data
             - ${this.options.networkRootPath}/artifacts/config/:/etc/hyperledger/configtx
             - ${this.options.networkRootPath}/artifacts/crypto-config/ordererOrganizations/hurley.lab/orderers/orderer.hurley.lab/:/etc/hyperledger/msp/orderer
 ${this.options.orgs.map(org => `
@@ -55,6 +57,7 @@ ${this.options.orgs.map((org, i) => `
         image: hyperledger/fabric-ca:${this.options.envVars.FABRIC_VERSION}
         environment:
             - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+            - FABRIC_CA_SERVER_HOME=/data
             - FABRIC_CA_SERVER_CA_NAME=ca.${org.name}.hurley.lab
             - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.${org.name}.hurley.lab-cert.pem
             - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/${certs[i]}
@@ -62,6 +65,7 @@ ${this.options.orgs.map((org, i) => `
             - "7${i}54:7054"
         command: fabric-ca-server start -b admin:adminpw -d
         volumes:
+            - ${this.options.networkRootPath}/data/ca-${org.name}/:/data
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org.name}.hurley.lab/ca/:/etc/hyperledger/fabric-ca-server-config
         container_name: ca.${org.name}.hurley.lab
         networks:
@@ -83,6 +87,7 @@ ${org.peers.map(peer => `
             - CORE_PEER_GOSSIP_EXTERNALENDPOINT=${peer.name}.${org.name}.hurley.lab:7051
             - CORE_PEER_CHAINCODELISTENADDRESS=${peer.name}.${org.name}.hurley.lab:7052
             - CORE_VM_DOCKER_ATTACHSTDOUT=true
+            - CORE_PEER_FILESYSTEMPATH=/data
             - CORE_CHAINCODE_EXECUTETIMEOUT=60
             - CORE_LOGGING_PEER=debug
             - CORE_LOGGING_LEVEL=DEBUG
@@ -109,6 +114,7 @@ ${org.peers.map(peer => `
             - ${peer.options.ports[2]}:7053
         volumes:
             - /var/run/:/host/var/run/
+            - ${this.options.networkRootPath}/data/peer-${peer.name}-${org.name}:/data
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org.name}.hurley.lab/peers/${peer.name}.${org.name}.hurley.lab/msp:/etc/hyperledger/msp/peer
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org.name}.hurley.lab/users:/etc/hyperledger/msp/users
             - ${this.options.networkRootPath}/artifacts/config:/etc/hyperledger/configtx
@@ -126,8 +132,11 @@ ${org.peers.map(peer => `
         environment:
             - COUCHDB_USER=
             - COUCHDB_PASSWORD=
+        command: bash -c "chown couchdb -R /opt/couchdb/data; /docker-entrypoint.sh /opt/couchdb/bin/couchdb"
         ports:
             - ${peer.options.couchDbPort}:5984
+        volumes:
+            - ${this.options.networkRootPath}/data/couch-${peer.name}-${org.name}:/opt/couchdb/data
         networks:
             - hurley_dev_net
 
