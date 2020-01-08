@@ -14,14 +14,14 @@ function collect(val, memo) {
 
 const tasks = {
     async createNetwork(network?: any, organizations?: string, users?: string, channels?: string,
-        path?: string, explorer?:boolean, inside?: boolean, skipDownload?: boolean) {
-        return await CLI.createNetwork(network, organizations, users, channels, path, explorer, inside, skipDownload);
+        path?: string, explorer?:boolean, inside?: boolean, skipDownload?: boolean, skipCleanUp?: boolean) {
+        return await CLI.createNetwork(network, organizations, users, channels, path, explorer, inside, skipDownload, skipCleanUp);
     },
     async startupExplorer(port: string){
         return CLI.startupExplorer(port);
     },
-    async cleanNetwork(rmi: boolean) {
-        return await CLI.cleanNetwork(rmi);
+    async cleanNetwork(rmi: boolean, path?: string) {
+        return await CLI.cleanNetwork(rmi, path);
     },
     async installChaincode(chaincode: string, language: string, orgs?: string[], channel?: string,
         version?: string, params?: string, path?: string, ccPath?: string,
@@ -52,15 +52,16 @@ program
     .option('-e, --explorer', 'Uses hyperledger explorer')
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .option('--skip-download', 'Skip downloading the Fabric Binaries and Docker images')
+    .option('--skip-cleanup', 'Skip deleting the <path>/data directory')
     // .option('-p, --peers <peers>', 'Peers per organization')
     .action(async (cmd: any) => {
         if (cmd) {
             await tasks.createNetwork(
                 cmd.network,
-                !cmd.organizations || (cmd.organizations <= 1) ? 1 : cmd.organizations,
+                !cmd.organizations ? 2 : cmd.organizations < 1 ? 1 : cmd.organizations,
                 !cmd.users || (cmd.users <= 1) ? 1 : cmd.users,
                 !cmd.channels || (cmd.channels <= 1) ? 1 : cmd.channels,
-                cmd.path, !!cmd.explorer ,!!cmd.inside, !!cmd.skipDownload
+                cmd.path, !!cmd.explorer ,!!cmd.inside, !!cmd.skipDownload, !!cmd.skipCleanUp
             );
         } else {
             await tasks.createNetwork();
@@ -79,8 +80,9 @@ program
 program
     .command('clean')
     .option('-R, --no-rmi', 'Do not remove docker images')
+    .option('-p, --path <path>', 'Path to deploy the network')
     .action(async (cmd: any) => {
-        await tasks.cleanNetwork(cmd.rmi); // if -R is not passed cmd.rmi is true
+        await tasks.cleanNetwork(cmd.rmi, cmd.path); // if -R is not passed cmd.rmi is true
     });
 
 program
