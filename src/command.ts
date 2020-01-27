@@ -53,7 +53,7 @@ program
         if (cmd) {
             await tasks.createNetwork(
                 cmd.network,
-                !cmd.organizations || (cmd.organizations <= 2) ? 2 : cmd.organizations,
+                !cmd.organizations || (cmd.organizations <= 1) ? 1 : cmd.organizations,
                 !cmd.users || (cmd.users <= 1) ? 1 : cmd.users,
                 !cmd.channels || (cmd.channels <= 1) ? 1 : cmd.channels,
                 cmd.path, !!cmd.inside, !!cmd.skipDownload
