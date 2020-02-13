@@ -119,7 +119,7 @@ dockerFabricPull() {
     dockerThirdPartyImagesPull $THIRDPARTY_TAG
     echo
     echo "===> List out hyperledger docker images"
-    docker images | grep hyperledger*
+    docker images | grep 'hyperledger*'
 
   }
 
