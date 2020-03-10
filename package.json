@@ -61,7 +61,7 @@
     "fabric-ca-client": "^1.4.0",
     "fabric-client": "^1.4.0",
     "fs-extra": "^7.0.1",
-    "inquirer": "^2.0.0",
+    "inquirer": "^7.1.0",
     "insight": "^0.10.1",
     "mem-fs": "^1.1.3",
     "mem-fs-editor": "^5.1.0",
