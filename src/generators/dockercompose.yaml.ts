@@ -90,6 +90,7 @@ ${org.peers.map(peer => `
             - CORE_LOGGING_GOSSIP=DEBUG
             - CORE_LOGGING_GRPC=DEBUG
             - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+            - CORE_CHAINCODE_BUILDER=hyperledger/fabric-ccenv:1.4.1
             - CORE_PEER_LOCALMSPID=${org.name}MSP
             - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@${org.name}.hurley.lab/msp
             - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
