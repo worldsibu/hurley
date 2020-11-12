@@ -2,7 +2,6 @@
 import { BaseGenerator } from './base';
 import { join } from 'path';
 import { Organization } from '../models/organization';
-import { Channel } from '../models/channel';
 
 export class NetworkProfileYamlGeneratorOptions {
     org: Organization;
@@ -12,6 +11,7 @@ export class NetworkProfileYamlGeneratorOptions {
     insideDocker: boolean;
 }
 export class NetworkProfileYamlGenerator extends BaseGenerator {
+
     contents =
         `name: "${this.options.org.name}"
 version: "1.0"

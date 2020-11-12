@@ -15,7 +15,7 @@ export class DockerComposeYamlOptions {
 }
 export class DockerComposeYamlGenerator extends BaseGenerator {
     success = join(this.path, 'dockercompose.yaml.successful');
-    constructor(filename: string, path: string, private options: DockerComposeYamlOptions) {
+    constructor(filename: string, path: string, public insideDocker: boolean, private options: DockerComposeYamlOptions) {
         super(filename, path);
     }
     async build() {
@@ -133,7 +133,7 @@ ${org.peers.map(peer => `
 
 `).join('')}
 `).join('')}
-      
+       
 volumes:
   shared:
 
