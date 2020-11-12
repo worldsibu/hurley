@@ -19,13 +19,18 @@ import { Channel } from './models/channel';
 import { Organization } from './models/organization';
 import { Peer } from './models/peer';
 import * as util from 'util';
+import { ConfigJsonGenerator } from './generators/config.json';
+import * as yaml from 'js-yaml';
+import { readFileSync, writeFileSync } from 'fs';
+import { ExplorerConnectionProfileJSONGenerator } from './generators/explorerConnectionProfile';
+import { ExplorerDockerComposeYamlGenerator } from './generators/explorerDockerCompose.yaml';
 
 export class CLI {
     static async createNetwork(network?: any, organizations?: string, users?: string, channels?: string,
-        path?: string, inside?: boolean, skipDownload?: boolean) {
+        path?: string, explorer?: boolean, inside?: boolean, skipDownload?: boolean) {
         const cli = new NetworkCLI();
         await cli.init(network, Number.parseInt(organizations), Number.parseInt(users),
-            Number.parseInt(channels), path, inside, skipDownload);
+            Number.parseInt(channels), path, explorer, inside, skipDownload);
         return cli;
     }
     static async cleanNetwork(rmi: boolean) {
@@ -63,9 +68,9 @@ export class NetworkCLI {
         this.analytics = new Analytics();
     }
 
-    public async init(network?: any, organizations?: number, users?: number, channels?: number, path?: string, inside?: boolean, skipDownload?: boolean) {
+    public async init(network?: any, organizations?: number, users?: number, channels?: number, path?: string, explorer?: boolean, inside?: boolean, skipDownload?: boolean) {
         this.analytics.init();
-        this.initNetwork(network, organizations, users, channels, path, inside, skipDownload);
+        this.initNetwork(network, organizations, users, channels, path, explorer, inside, skipDownload);
     }
 
     async initNetwork(
@@ -74,6 +79,7 @@ export class NetworkCLI {
         users?: number,
         channels?: number,
         path?: string,
+        explorer?: boolean,
         insideDocker?: boolean,
         skipDownload = false
     ) {
@@ -98,15 +104,23 @@ export class NetworkCLI {
             orgs: network.organizations,
             users: 0
         });
+
+        let configJson = new ConfigJsonGenerator('config.json',
+            join(path, './explorer'));
+
         let dockerComposer = new DockerComposeYamlGenerator('docker-compose.yaml',
+            path, insideDocker, {
+            orgs: network.organizations,
+            networkRootPath: path,
+            envVars: {
+                FABRIC_VERSION: '1.4.0',
+                THIRDPARTY_VERSION: '0.4.14'
+            }
+        });
+        let explorerDockerComposer = new ExplorerDockerComposeYamlGenerator('docker-compose-explorer.yaml',
             path, {
-                orgs: network.organizations,
-                networkRootPath: path,
-                envVars: {
-                    FABRIC_VERSION: '1.4.0',
-                    THIRDPARTY_VERSION: '0.4.14'
-                }
-            });
+            networkRootPath: path
+        });
         let cryptoGenerator = new CryptoGeneratorShGenerator('generator.sh', path, {
             orgs: network.organizations,
             networkRootPath: path,
@@ -167,27 +181,31 @@ export class NetworkCLI {
         l(`Saved compose`);
 
         l(`Creating network profiles`);
+        let networkProfilePath = join(path, './network-profiles');
         await Promise.all(network.organizations.map(async org => {
             l(`Cleaning .hfc-${org.name}`);
             await SysWrapper.removePath(join(path, `.hfc-${org.name}`));
             l(`Creating for ${org.name}`);
             await (new NetworkProfileYamlGenerator(`${org.name}.network-profile.yaml`,
-                join(path, './network-profiles'), {
-                    org,
-                    orgs: network.organizations,
-                    networkRootPath: path,
-                    insideDocker: false
-                })).save();
+                networkProfilePath, {
+                org,
+                orgs: network.organizations,
+                networkRootPath: path,
+                insideDocker: false
+            })).save();
+
             l(`Creating for ${org.name} inside Docker`);
             await (new NetworkProfileYamlGenerator(`${org.name}.network-profile.inside-docker.yaml`,
-                join(path, './network-profiles'), {
-                    org,
-                    orgs: network.organizations,
-                    networkRootPath: path,
-                    insideDocker: true
-                })).save();
+                networkProfilePath, {
+                org,
+                orgs: network.organizations,
+                networkRootPath: path,
+                insideDocker: true
+            })).save();
+
         }
         ));
+
         l(`Created network profiles`);
 
         l(`Creating network restart script`);
@@ -196,6 +214,27 @@ export class NetworkCLI {
         l(`Running network restart script`);
         await networkRestart.run();
         l(`Ran network restart script`);
+
+        if (explorer) {
+
+            l(`Running explorer config`);
+            await configJson.save();
+            l(`Ran explorer config`);
+
+            l(`Creating explorer connection-profile`);
+            await (new ExplorerConnectionProfileJSONGenerator(`explorer-connection-profile.json`,
+                networkProfilePath, {
+                org: network.organizations[0],
+                networkRootPath: path
+            })).save();
+            l(`Created explorer connection-profile`);
+
+            l(`Creating explorer compose file`);
+            await explorerDockerComposer.save();
+            l(`Created explorer compose file`);
+
+            await SysWrapper.execContent(`docker-compose -f ${path}/docker-compose-explorer.yaml up -d`);
+        }
 
         this.analytics.trackNetworkNew(JSON.stringify(network));
         l('************ Success!');
@@ -217,8 +256,8 @@ export class NetworkCLI {
     }
 
     public async clean(rmi: boolean) {
-        const options = new NetworkCleanShOptions()
-        options.removeImages = rmi
+        const options = new NetworkCleanShOptions();
+        options.removeImages = rmi;
         let networkClean = new NetworkCleanShGenerator('clean.sh', 'na', options);
         await networkClean.run();
         this.analytics.trackNetworkClean();
@@ -335,7 +374,7 @@ export class ChaincodeCLI {
         if (!org) {
             org = new Organization('org1', {
                 channels: [],
-                peers: [new Peer(`peer0`, { number: 0, ports: ['7051', '7052', '7053'], couchDbPort: '5084'})],
+                peers: [new Peer(`peer0`, { number: 0, ports: ['7051', '7052', '7053'], couchDbPort: '5084' })],
                 users: []
             });
         }
@@ -347,7 +386,7 @@ export class ChaincodeCLI {
             hyperledgerVersion: network.options.hyperledgerVersion,
             insideDocker,
             user,
-            organization: org 
+            organization: org
         }, ...args);
 
         await chaincodeInteractor.invoke();

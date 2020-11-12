@@ -14,8 +14,8 @@ function collect(val, memo) {
 
 const tasks = {
     async createNetwork(network?: any, organizations?: string, users?: string, channels?: string,
-        path?: string, inside?: boolean, skipDownload?: boolean) {
-        return await CLI.createNetwork(network, organizations, users, channels, path, inside, skipDownload);
+        path?: string, explorer?:boolean, inside?: boolean, skipDownload?: boolean) {
+        return await CLI.createNetwork(network, organizations, users, channels, path, explorer, inside, skipDownload);
     },
     async cleanNetwork(rmi: boolean) {
         return await CLI.cleanNetwork(rmi);
@@ -46,6 +46,7 @@ program
     .option('-o, --organizations <organizations>', 'Amount of organizations')
     .option('-u, --users <users>', 'Users per organization')
     .option('-p, --path <path>', 'Path to deploy the network')
+    .option('-e, --explorer', 'Uses hyperledger explorer')
     .option('-i, --inside', 'Optimized for running inside the docker compose network')
     .option('--skip-download', 'Skip downloading the Fabric Binaries and Docker images')
     // .option('-p, --peers <peers>', 'Peers per organization')
@@ -56,7 +57,7 @@ program
                 !cmd.organizations || (cmd.organizations <= 1) ? 1 : cmd.organizations,
                 !cmd.users || (cmd.users <= 1) ? 1 : cmd.users,
                 !cmd.channels || (cmd.channels <= 1) ? 1 : cmd.channels,
-                cmd.path, !!cmd.inside, !!cmd.skipDownload
+                cmd.path, !!cmd.explorer ,!!cmd.inside, !!cmd.skipDownload
             );
         } else {
             await tasks.createNetwork();

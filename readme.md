@@ -123,7 +123,9 @@ hurl invoke <chaincode> <fn>  [args...]
     [-u, --user <user>] # Select an specific user to execute command. Default user1
     [-o, --organization <organization>] # Select a specific organisation to execute the command. Default org1
     [-C --channel <channel>] # Defaults to ch1
+    [-e, --explorer] # Uses hyperledger explorer with default credential admin / admin
     [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
+    [--skip-download] # Skip downloading the Fabric Binaries and Docker images
 ```
 
 The main parameters here are `<chaincode>`, `<fn>`, and [args...] where [args...] is an array of params separated by a blank space, for example:
