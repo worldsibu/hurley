@@ -17,6 +17,9 @@ const tasks = {
         path?: string, explorer?:boolean, inside?: boolean, skipDownload?: boolean) {
         return await CLI.createNetwork(network, organizations, users, channels, path, explorer, inside, skipDownload);
     },
+    async startupExplorer(port: string){
+        return CLI.startupExplorer(port);
+    },
     async cleanNetwork(rmi: boolean) {
         return await CLI.cleanNetwork(rmi);
     },
@@ -63,6 +66,16 @@ program
             await tasks.createNetwork();
         }
     });
+
+
+program
+    .command('explorer')
+    .option('-p, --port <port>', 'Port where explorer will run','8080')
+    .action(async (cmd: any) => {
+        await tasks.startupExplorer(cmd.port); // if -R is not passed cmd.rmi is true
+    });
+
+
 program
     .command('clean')
     .option('-R, --no-rmi', 'Do not remove docker images')

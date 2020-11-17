@@ -33,6 +33,14 @@ export class CLI {
             Number.parseInt(channels), path, explorer, inside, skipDownload);
         return cli;
     }
+
+    static async startupExplorer(port: string){
+        const cli = new NetworkCLI();
+        await cli.startupExplorer(port);
+        return cli;
+    }
+
+
     static async cleanNetwork(rmi: boolean) {
         const cli = new NetworkCLI();
         await cli.clean(rmi);
@@ -215,26 +223,21 @@ export class NetworkCLI {
         await networkRestart.run();
         l(`Ran network restart script`);
 
-        if (explorer) {
+        l(`Running explorer config`);
+        await configJson.save();
+        l(`Ran explorer config`);
 
-            l(`Running explorer config`);
-            await configJson.save();
-            l(`Ran explorer config`);
+        l(`Creating explorer connection-profile`);
+        await (new ExplorerConnectionProfileJSONGenerator(`explorer-connection-profile.json`,
+            networkProfilePath, {
+            org: network.organizations[0],
+            networkRootPath: path
+        })).save();
+        l(`Created explorer connection-profile`);
 
-            l(`Creating explorer connection-profile`);
-            await (new ExplorerConnectionProfileJSONGenerator(`explorer-connection-profile.json`,
-                networkProfilePath, {
-                org: network.organizations[0],
-                networkRootPath: path
-            })).save();
-            l(`Created explorer connection-profile`);
-
-            l(`Creating explorer compose file`);
-            await explorerDockerComposer.save();
-            l(`Created explorer compose file`);
-
-            await SysWrapper.execContent(`docker-compose -f ${path}/docker-compose-explorer.yaml up -d`);
-        }
+        l(`Creating explorer compose file`);
+        await explorerDockerComposer.save();
+        l(`Created explorer compose file`);
 
         this.analytics.trackNetworkNew(JSON.stringify(network));
         l('************ Success!');
@@ -253,6 +256,17 @@ export class NetworkCLI {
         `);
         l(`You can find the network topology (ports, names) here: ${join(path, 'docker-compose.yaml')}`);
         await SaveNetworkConfig(path, network);
+    }
+
+    public async startupExplorer(port: string) {
+
+        const homedir = require('os').homedir();
+        let path = join(homedir, this.networkRootPath);
+
+        await SysWrapper.execContent(`PORT=${port} docker-compose -f ${path}/docker-compose-explorer.yaml down`);
+
+        await SysWrapper.execContent(`PORT=${port} docker-compose -f ${path}/docker-compose-explorer.yaml up -d`);
+
     }
 
     public async clean(rmi: boolean) {

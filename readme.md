@@ -58,6 +58,16 @@ hurl new
     [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
 ```
 
+### hurl explorer
+
+Brings up a hyperledger explorer instance, restart if there is a running one
+
+```bash
+# Runs hyperledger explorer
+hurl explorer
+    [-p --port <path-to-install-the-network>] # Port where explorer will run (default: "8080")
+```
+
 ### hurl clean
 
 Clear your environment from all the components.
@@ -123,7 +133,6 @@ hurl invoke <chaincode> <fn>  [args...]
     [-u, --user <user>] # Select an specific user to execute command. Default user1
     [-o, --organization <organization>] # Select a specific organisation to execute the command. Default org1
     [-C --channel <channel>] # Defaults to ch1
-    [-e, --explorer] # Uses hyperledger explorer with default credential admin / admin
     [-i --inside] # Whether or not the `hurl` command will runs inside the same Docker network where the blockchain was provisioned
     [--skip-download] # Skip downloading the Fabric Binaries and Docker images
 ```

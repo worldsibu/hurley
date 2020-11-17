@@ -22,7 +22,7 @@ export class ExplorerConnectionProfileJSONGenerator extends BaseGenerator {
                     "id": "admin",
                     "password": "admin"
                 },
-                "enableAuthentication": true,
+                "enableAuthentication": false,
                 "organization": "${this.options.org.name}MSP",
                 "connection": {
                     "timeout": {
@@ -66,7 +66,9 @@ export class ExplorerConnectionProfileJSONGenerator extends BaseGenerator {
                     "tlsCACerts": {
                         "path": "/tmp/crypto/peerOrganizations/${this.options.org.name}.hurley.lab/peers/peer0.${this.options.org.name}.hurley.lab/tls/ca.crt"
                     },
-                    "url": "grpc://peer0.${this.options.org.name}.hurley.lab:7051"                }
+                    "url": "grpc://peer0.${this.options.org.name}.hurley.lab:7051",
+                    "eventUrl ":"grpc://peer0.${this.options.org.name}.hurley.lab:7052"
+                    }
             }
         }` ;
 
