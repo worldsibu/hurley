@@ -52,7 +52,7 @@ services:
           - ${this.options.networkRootPath}/artifacts/crypto-config/:/tmp/crypto/
           - ${this.options.networkRootPath}/explorer/wallet/:/opt/wallet/
         ports:
-          - 8080:8080
+          - \${PORT}:8080
         depends_on:
           explorerdb:
             condition: service_healthy
