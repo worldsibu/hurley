@@ -113,7 +113,7 @@ ${org.peers.map(peer => `
             - ${peer.options.ports[1]}:7052
             - ${peer.options.ports[2]}:7053
         volumes:
-            - /var/run/:/host/var/run/
+            - /var/run/docker.sock:/host/var/run/docker.sock
             - ${this.options.networkRootPath}/data/peer-${peer.name}-${org.name}:/data
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org.name}.hurley.lab/peers/${peer.name}.${org.name}.hurley.lab/msp:/etc/hyperledger/msp/peer
             - ${this.options.networkRootPath}/artifacts/crypto-config/peerOrganizations/${org.name}.hurley.lab/users:/etc/hyperledger/msp/users
