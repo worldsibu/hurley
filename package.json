@@ -58,7 +58,7 @@
     "chalk": "^1.1.3",
     "commander": "^2.9.0",
     "ejs": "^2.6.1",
-    "fabric-ca-client": "^1.4.0",
+    "fabric-ca-client": "^2.2.4",
     "fabric-client": "^1.4.0",
     "fs-extra": "^7.0.1",
     "inquirer": "^2.0.0",
