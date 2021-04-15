@@ -27,10 +27,10 @@ import { ExplorerDockerComposeYamlGenerator } from './generators/explorerDockerC
 
 export class CLI {
     static async createNetwork(network?: any, organizations?: string, users?: string, channels?: string,
-        path?: string, explorer?: boolean, inside?: boolean, skipDownload?: boolean) {
+        path?: string, explorer?: boolean, inside?: boolean, skipDownload?: boolean, skipCleanUp?: boolean) {
         const cli = new NetworkCLI();
         await cli.init(network, Number.parseInt(organizations), Number.parseInt(users),
-            Number.parseInt(channels), path, explorer, inside, skipDownload);
+            Number.parseInt(channels), path, explorer, inside, skipDownload, skipCleanUp);
         return cli;
     }
 
@@ -40,10 +40,9 @@ export class CLI {
         return cli;
     }
 
-
-    static async cleanNetwork(rmi: boolean) {
+    static async cleanNetwork(rmi: boolean, path?: string) {
         const cli = new NetworkCLI();
-        await cli.clean(rmi);
+        await cli.clean(rmi, path);
         return cli;
     }
 
@@ -76,9 +75,9 @@ export class NetworkCLI {
         this.analytics = new Analytics();
     }
 
-    public async init(network?: any, organizations?: number, users?: number, channels?: number, path?: string, explorer?: boolean, inside?: boolean, skipDownload?: boolean) {
+    public async init(network?: any, organizations?: number, users?: number, channels?: number, path?: string, explorer?: boolean, inside?: boolean, skipDownload?: boolean, skipCleanUp?: boolean) {
         this.analytics.init();
-        this.initNetwork(network, organizations, users, channels, path, explorer, inside, skipDownload);
+        this.initNetwork(network, organizations, users, channels, path, explorer, inside, skipDownload, skipCleanUp);
     }
 
     async initNetwork(
@@ -89,7 +88,8 @@ export class NetworkCLI {
         path?: string,
         explorer?: boolean,
         insideDocker?: boolean,
-        skipDownload = false
+        skipDownload = false,
+        skipCleanUp = false
     ) {
         const homedir = require('os').homedir();
         path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
@@ -191,8 +191,12 @@ export class NetworkCLI {
         l(`Creating network profiles`);
         let networkProfilePath = join(path, './network-profiles');
         await Promise.all(network.organizations.map(async org => {
-            l(`Cleaning .hfc-${org.name}`);
-            await SysWrapper.removePath(join(path, `.hfc-${org.name}`));
+            if (!skipCleanUp) {
+                l(`Cleaning .hfc-${org.name}`);
+                await SysWrapper.removePath(join(path, `.hfc-${org.name}`));
+                l(`Cleaning /data foldder`);
+                await SysWrapper.removePath(join(path, 'data'));
+            }
             l(`Creating for ${org.name}`);
             await (new NetworkProfileYamlGenerator(`${org.name}.network-profile.yaml`,
                 networkProfilePath, {
@@ -269,9 +273,12 @@ export class NetworkCLI {
 
     }
 
-    public async clean(rmi: boolean) {
-        const options = new NetworkCleanShOptions();
-        options.removeImages = rmi;
+    public async clean(rmi: boolean, path?: string) {
+        const homedir = require('os').homedir();
+        path = path ? resolve(homedir, path) : join(homedir, this.networkRootPath);
+        const options = new NetworkCleanShOptions()
+        options.removeImages = rmi
+        options.networkRootPath = path;
         let networkClean = new NetworkCleanShGenerator('clean.sh', 'na', options);
         await networkClean.run();
         this.analytics.trackNetworkClean();
