@@ -101,6 +101,7 @@ ${org.peers.map(peer => `
             - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
             - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
             - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=net_hurley_dev_net
+            - GODEBUG=netdns=go
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric
         command: peer node start --peer-chaincodedev=true
         ports:
