@@ -1,6 +1,6 @@
 {
   "name": "@worldsibu/hurley",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "The development environment toolset for enterprise blockchain projects",
   "main": "index.js",
   "files": [
