@@ -101,7 +101,7 @@ program
             return tasks.installChaincode(
                 name,
                 language,
-                cmd.org,
+                JSON.parse(cmd.org),
                 channel,
                 '1.0',
                 cmd.ctor,
@@ -130,7 +130,7 @@ program
             return tasks.upgradeChaincode(
                 name,
                 language,
-                cmd.org,
+                JSON.parse(cmd.org),
                 channel,
                 ver,
                 cmd.ctor,
